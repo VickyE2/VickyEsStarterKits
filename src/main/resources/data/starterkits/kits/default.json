@@ -1,0 +1,17 @@
+{
+  "id": "default",
+  "name": "Starter Warrior Kit",
+  "items": [
+    {
+      "item": "minecraft:iron_sword",
+      "nbt": "{Enchantments:[{id:sharpness,lvl:1}]}"
+    },
+    {
+      "item": "minecraft:bread",
+      "count": 8
+    }
+  ],
+  "description": "A basic kit to start your adventures..",
+  "textColor": "#AA0000",
+  "descriptionColor": "#ff7c6e"
+}
