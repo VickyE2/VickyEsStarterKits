@@ -30,6 +30,20 @@ public record KitListPacket(List<Kit> kits) {
                 buf.writeInt(item.count);
                 buf.writeUtf(item.nbt != null ? item.nbt : "");
             }
+
+            List<Kit.KitSlotable> slotables = kit.slotables != null ? kit.slotables : Collections.emptyList();
+            buf.writeInt(slotables.size());
+            for (Kit.KitSlotable slotable : slotables) {
+                buf.writeUtf(slotable.item != null ? slotable.item : "minecraft:air");
+                buf.writeUtf(slotable.slot != null ? slotable.slot : "offhand");
+                buf.writeUtf(slotable.nbt != null ? slotable.nbt : "");
+            }
+
+            List<String> permissions = kit.requiredPermissions != null ? kit.requiredPermissions : Collections.emptyList();
+            buf.writeInt(permissions.size());
+            for (String perm : permissions) {
+                buf.writeUtf(perm != null ? perm : "");
+            }
         }
     }
 
@@ -53,6 +67,25 @@ public record KitListPacket(List<Kit> kits) {
                 item.nbt = nbtStr.isEmpty() ? null : nbtStr;
                 kit.items.add(item);
             }
+
+            int slotableCount = buf.readInt();
+            kit.slotables = new ArrayList<>();
+            for (int j = 0; j < slotableCount; j++) {
+                Kit.KitSlotable item = new Kit.KitSlotable();
+                item.item = buf.readUtf();
+                item.slot = buf.readUtf();
+                String nbtStr = buf.readUtf();
+                item.nbt = nbtStr.isEmpty() ? null : nbtStr;
+                kit.slotables.add(item);
+            }
+
+            int permsCount = buf.readInt();
+            kit.requiredPermissions = new ArrayList<>();
+            for (int j = 0; j < permsCount; j++) {
+                String perm = buf.readUtf();
+                kit.requiredPermissions.add(perm);
+            }
+
             kits.add(kit);
             StarterKits.LOGGER.info("Received kit: {}, textColor=0x{}", kit.name, String.format("%08X", kit.textColor));
         }
@@ -62,8 +95,10 @@ public record KitListPacket(List<Kit> kits) {
     public static void handle(KitListPacket msg, Supplier<NetworkEvent.Context> ctx) {
         var kitsCopy = msg.kits != null ? msg.kits : new ArrayList<Kit>(); // <— local copy, now "safe"
         ctx.get().enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ClientKitManager.INSTANCE::clearKits);
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientKitManager.INSTANCE.acceptKits(kitsCopy));
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+                ClientKitManager.INSTANCE.clearKits();
+                ClientKitManager.INSTANCE.acceptKits(kitsCopy);
+            });
         });
         ctx.get().setPacketHandled(true);
     }

@@ -17,8 +17,7 @@ public class ColorPickerWidget extends AbstractWidget {
     private final SimpleSlider redSlider, greenSlider, blueSlider;
     private SimpleSlider activeSlider = null;
 
-
-    private int red = 255, green = 0, blue = 0;
+    private int red = 255, green = 255, blue = 255;
 
     public ColorPickerWidget(int x, int y, Function<Integer, Void> onChange) {
         super(x, y, 0, 0, new TextComponent("Color Picker"));

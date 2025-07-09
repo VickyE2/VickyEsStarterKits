@@ -40,6 +40,16 @@ public class PacketHandler {
                 .encoder(OpenKitSelectorScreenPacket::encode)
                 .consumer(OpenKitSelectorScreenPacket::handle)
                 .add();
+        INSTANCE.messageBuilder(RandomKitSelectionResultPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(RandomKitSelectionResultPacket::encode)
+                .decoder(RandomKitSelectionResultPacket::decode)
+                .consumer(RandomKitSelectionResultPacket::handle)
+                .add();
+        INSTANCE.messageBuilder(RequestRandomKitPacket.class, packetId++, NetworkDirection.PLAY_TO_SERVER)
+                .decoder(RequestRandomKitPacket::decode)
+                .encoder(RequestRandomKitPacket::encode)
+                .consumer(RequestRandomKitPacket::handle)
+                .add();
 
     }
 }

@@ -22,21 +22,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static org.vicky.starterkits.data.KitDeserializer.parseHexColor;
 
-public record CreateKitPacket(String kitName, @Nullable String description, List<ItemStack> kitItems, String texColor, String descriptionColor) {
+public record CreateKitPacket(String kitName, @Nullable String description, List<ItemStack> kitItems, Map<ItemStack, String> slotables, List<String> perms, String texColor, String descriptionColor, int weight) {
 
     public static void encode(CreateKitPacket pkt, FriendlyByteBuf buf) {
         buf.writeUtf(pkt.kitName);
-        buf.writeBoolean(pkt.description != null);
-        if (pkt.description != null) {
-            buf.writeUtf(pkt.description);
-        }
+        buf.writeUtf(pkt.description != null ? pkt.description : "");
         if (pkt.texColor != null && !pkt.texColor.isEmpty()) {
             buf.writeUtf(pkt.texColor);
         } else {
@@ -47,28 +42,46 @@ public record CreateKitPacket(String kitName, @Nullable String description, List
         } else {
             buf.writeUtf("#FFFFFF");
         }
+        buf.writeInt(pkt.weight);
         buf.writeInt(pkt.kitItems.size());
         for (ItemStack stack : pkt.kitItems) {
             buf.writeItem(stack);
+        }
+        buf.writeInt(pkt.slotables.size());
+        for (var stack : pkt.slotables.entrySet()) {
+            buf.writeItem(stack.getKey());
+            buf.writeUtf(stack.getValue());
+        }
+        buf.writeInt(pkt.perms.size());
+        for (String stack : pkt.perms) {
+            buf.writeUtf(stack);
         }
     }
 
     public static CreateKitPacket decode(FriendlyByteBuf buf) {
         String name = buf.readUtf();
-
-        String desc = null;
-        if (buf.readBoolean()) {
-            desc = buf.readUtf();
-        }
+        String desc = buf.readUtf();
+        if (desc.isEmpty()) desc = "";
         String textColor = buf.readUtf();
         String descColor = buf.readUtf();
+        int weight = buf.readInt();
         int size = buf.readInt();
         List<ItemStack> items = new java.util.ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             items.add(buf.readItem());
         }
+        int slotablesSize = buf.readInt();
+        Map<ItemStack, String> slotables = new java.util.HashMap<>(slotablesSize);
+        for (int i = 0; i < slotablesSize; i++) {
+            slotables.put(buf.readItem(), buf.readUtf());
+        }
+        int permsSize = buf.readInt();
+        List<String> perms = new java.util.ArrayList<>(permsSize);
+        for (int i = 0; i < permsSize; i++) {
+            perms.add(buf.readUtf());
+        }
 
-        return new CreateKitPacket(name, desc, items, textColor, descColor);
+        return new CreateKitPacket(name, desc, items, slotables, perms, textColor, descColor, weight);
     }
 
 
@@ -80,7 +93,10 @@ public record CreateKitPacket(String kitName, @Nullable String description, List
             toMake.description = pkt.description;
             toMake.textColor = parseHexColor(pkt.texColor);
             toMake.descriptionColor = parseHexColor(pkt.descriptionColor);
-            toMake.items = new ArrayList<>();
+            toMake.weight = pkt.weight;
+            if (toMake.items == null) toMake.items = new ArrayList<>();
+            if (toMake.slotables == null) toMake.slotables = new ArrayList<>();
+            if (toMake.requiredPermissions == null) toMake.requiredPermissions = new ArrayList<>();
             for (var item : pkt.kitItems) {
                 if (item == null) continue;
 
@@ -94,11 +110,32 @@ public record CreateKitPacket(String kitName, @Nullable String description, List
 
                 toMake.items.add(kitItem);
             }
+            for (var slotable : pkt.slotables.entrySet()) {
+                if (slotable.getKey() == null) continue;
+                if (slotable.getValue().isEmpty()) continue;
+
+                Kit.KitSlotable kitSlotable = new Kit.KitSlotable();
+
+                var tag = slotable.getKey().getTag();
+                kitSlotable.nbt = tag != null ? tag.toString() : null;
+                var nullable = ForgeRegistries.ITEMS.getKey(slotable.getKey().getItem());
+                kitSlotable.item = nullable != null ? nullable.toString() : "minecraft:air";
+                if (slotable.getKey().getCount() > 1 && slotable.getValue().equals("offhand")) {
+                    kitSlotable.item += ":" + slotable.getKey().getCount();
+                }
+                kitSlotable.slot = slotable.getValue();
+                toMake.slotables.add(kitSlotable);
+            }
+            for (var perm : pkt.perms) {
+                if (perm.isEmpty()) continue;
+                toMake.requiredPermissions.add(perm);
+            }
 
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(Kit.class, new KitDeserializer())
                     .registerTypeAdapter(Kit.class, new KitSerializer())
                     .registerTypeAdapter(Kit.KitItem.class, new KitDeserializer.KitItemDeserializer())
+                    .registerTypeAdapter(Kit.KitSlotable.class, new KitDeserializer.KitSlotableDeserializer())
                     .setPrettyPrinting()
                     .create();
 
@@ -110,8 +147,10 @@ public record CreateKitPacket(String kitName, @Nullable String description, List
             }
             try (FileWriter writer = new FileWriter(jsonKitFile)) {
                 writer.write(jsonKit);
+                ctx.get().getSender().sendMessage(ComponentUtil.createTranslated("§aKit Created Successfully"), UUID.randomUUID());
             } catch (IOException e) {
                 StarterKits.LOGGER.error("Could not write kit JSON!", e);
+                ctx.get().getSender().sendMessage(ComponentUtil.createTranslated("§sCould not write kit JSON! " + e.getMessage()), UUID.randomUUID());
                 e.printStackTrace();
             }
         });

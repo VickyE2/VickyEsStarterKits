@@ -20,7 +20,7 @@ public class DividerEntry extends ContainerObjectSelectionList.Entry<DividerEntr
                 lineY,       // start y
                 x + width,   // end x
                 lineY + 1,   // end y (1 pixel tall)
-                0xAA888888   // ARGB gray
+                0x44447777   // ARGB gray
         );
     }
 

@@ -22,6 +22,8 @@ public class StarterKitsConfig {
         public final ForgeConfigSpec.ConfigValue<List<String>> kitSelectorItemLore;
         public final ForgeConfigSpec.EnumValue<GiveSelectorMode> giveSelectorMode;
         public final ForgeConfigSpec.ConfigValue<Integer> kitMaxUsages;
+        public final ForgeConfigSpec.ConfigValue<Boolean> kitIsSelectable;
+        public final ForgeConfigSpec.ConfigValue<Boolean> allowRollableKits;
 
         public CommonConfig(ForgeConfigSpec.Builder builder) {
             builder.push("General");
@@ -31,6 +33,12 @@ public class StarterKitsConfig {
             kitMaxUsages = builder
                     .comment("The number of times a player can use the kit selector to claim kits...")
                     .define("kitMaxUsages", 2);
+            kitIsSelectable = builder
+                    .comment("This sets weather or not to use randomised weighted selection for kits")
+                    .define("kitIsSelectable", true);
+            allowRollableKits = builder
+                    .comment("Allow players to roll random kit even when not enforced")
+                    .define("allowRollableKits", true);
             builder.pop();
             builder.push("SelectorItem");
             kitSelectorItemName = builder

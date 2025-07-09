@@ -3,11 +3,18 @@ package org.vicky.starterkits.client.gui;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.entity.player.Player;
 import org.vicky.starterkits.client.ClientKitManager;
 import org.vicky.starterkits.client.ComponentUtil;
+import org.vicky.starterkits.config.StarterKitsConfig;
+import org.vicky.starterkits.data.Kit;
 import org.vicky.starterkits.network.packets.ChooseKitPacket;
+import org.vicky.starterkits.network.packets.RequestRandomKitPacket;
+
+import java.util.List;
 
 public class KitSelectionScreen extends Screen {
+    public static final boolean allowConfirmRollable = StarterKitsConfig.COMMON.kitIsSelectable.get() && StarterKitsConfig.COMMON.allowRollableKits.get();
     private KitList kitList;
 
     public KitSelectionScreen() {
@@ -25,13 +32,33 @@ public class KitSelectionScreen extends Screen {
         ));
 
         this.addRenderableWidget(kitList);
-
-        // Confirm button
+        int startX = this.width / 2 - 50;
+        if (allowConfirmRollable) {
+            startX = this.width / 2 - 90;
+            this.addRenderableWidget(new net.minecraft.client.gui.components.Button(
+                startX + 110, this.height - 30, 20, 20, ComponentUtil.createTranslated("↺"),
+                btn -> requestRandomSelection()
+            ));
+        }
         this.addRenderableWidget(new net.minecraft.client.gui.components.Button(
-                this.width / 2 - 50, this.height - 30, 100, 20,
-                ComponentUtil.createTranslated("Confirm"),
-                btn -> confirmSelection()
+                startX, this.height - 30, 100, 20,
+                StarterKitsConfig.COMMON.kitIsSelectable.get() ? ComponentUtil.createTranslated("Confirm") : ComponentUtil.createTranslated("Get Random"),
+                btn -> {
+                    if (StarterKitsConfig.COMMON.kitIsSelectable.get()) {
+                        confirmSelection();
+                    }
+                    else {
+                        requestRandomSelection();
+                    }
+                }
         ));
+    }
+
+    private void requestRandomSelection() {
+        this.onClose();
+        org.vicky.starterkits.network.PacketHandler.INSTANCE.sendToServer(
+                new RequestRandomKitPacket()
+        );
     }
 
     @Override
@@ -44,7 +71,7 @@ public class KitSelectionScreen extends Screen {
         if (selected != null) {
             var kitName = selected.kit.name;
             org.vicky.starterkits.network.PacketHandler.INSTANCE.sendToServer(
-                    new ChooseKitPacket(kitName)
+                    new ChooseKitPacket(kitName, true)
             );
             this.onClose();
         }
@@ -55,6 +82,11 @@ public class KitSelectionScreen extends Screen {
         this.renderBackground(poseStack);
         kitList.tick();
         drawCenteredString(poseStack, this.font, this.title, this.width / 2, 15, 0xFFFFFF);
+        int x = this.width / 2 - 30;
+        int y = this.height - 30;
+        if (allowConfirmRollable && (mouseX >= x  && mouseX <= x + 20 && mouseY >= y && mouseY <= y + 20)) {
+            Minecraft.getInstance().screen.renderTooltip(poseStack, List.of(ComponentUtil.colorize("§6Roll a random kit (takes 1 usage)")), java.util.Optional.empty(), mouseX, mouseY);
+        }
         super.render(poseStack, mouseX, mouseY, partialTicks);
     }
 }

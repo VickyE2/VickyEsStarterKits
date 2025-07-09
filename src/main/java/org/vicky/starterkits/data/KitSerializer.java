@@ -18,12 +18,28 @@ public class KitSerializer implements JsonSerializer<Kit> {
         obj.addProperty("textColor", colorToHexString(kit.textColor));
         obj.addProperty("descriptionColor", colorToHexString(kit.descriptionColor));
 
+        obj.addProperty("weight", kit.weight);
+
         // Serialize items
         JsonArray itemsArray = new JsonArray();
         for (Kit.KitItem item : kit.items) {
             itemsArray.add(context.serialize(item));
         }
         obj.add("items", itemsArray);
+
+        // Serialize items
+        JsonArray slotablesArray = new JsonArray();
+        for (Kit.KitSlotable slotable : kit.slotables) {
+            slotablesArray.add(context.serialize(slotable));
+        }
+        obj.add("slotables", slotablesArray);
+
+        // Serialize permissions
+        JsonArray permissionsArray = new JsonArray();
+        for (String item : kit.requiredPermissions) {
+            permissionsArray.add(item);
+        }
+        obj.add("permissions", permissionsArray);
 
         return obj;
     }
