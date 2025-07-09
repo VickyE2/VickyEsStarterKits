@@ -6,10 +6,7 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.vicky.starterkits.StarterKits;
-import org.vicky.starterkits.network.packets.ChooseKitPacket;
-import org.vicky.starterkits.network.packets.CreateKitPacket;
-import org.vicky.starterkits.network.packets.KitListPacket;
-import org.vicky.starterkits.network.packets.SyncClaimedKitsPacket;
+import org.vicky.starterkits.network.packets.*;
 
 import java.util.Optional;
 
@@ -37,6 +34,11 @@ public class PacketHandler {
                 .encoder(SyncClaimedKitsPacket::encode)
                 .decoder(SyncClaimedKitsPacket::decode)
                 .consumer(SyncClaimedKitsPacket::handle)
+                .add();
+        INSTANCE.messageBuilder(OpenKitSelectorScreenPacket.class, packetId++)
+                .decoder(OpenKitSelectorScreenPacket::decode)
+                .encoder(OpenKitSelectorScreenPacket::encode)
+                .consumer(OpenKitSelectorScreenPacket::handle)
                 .add();
 
     }

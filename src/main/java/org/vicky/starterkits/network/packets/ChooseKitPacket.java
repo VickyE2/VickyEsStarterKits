@@ -44,7 +44,7 @@ public record ChooseKitPacket(String kitName) {
 
                             if (left <= 0) {
                                 player.broadcastBreakEvent(InteractionHand.MAIN_HAND);
-                                stack.shrink(1);
+                                player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                             }
                         }
                     } else {

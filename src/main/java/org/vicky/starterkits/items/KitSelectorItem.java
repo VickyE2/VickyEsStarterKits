@@ -3,6 +3,7 @@ package org.vicky.starterkits.items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.InteractionResultHolder;
@@ -13,10 +14,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.vicky.starterkits.StarterKits;
 import org.vicky.starterkits.client.ComponentUtil;
 import org.vicky.starterkits.client.gui.KitCreationScreen;
 import org.vicky.starterkits.client.gui.KitSelectionScreen;
+import org.vicky.starterkits.network.PacketHandler;
+import org.vicky.starterkits.network.packets.OpenKitSelectorScreenPacket;
 
 import java.util.UUID;
 
@@ -35,18 +40,14 @@ public class KitSelectorItem extends Item {
             int left = tag.getInt(TAG_LEFT);
 
             if (left > 0) {
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> KitSelectorItem::openScreen);
+                PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                        new OpenKitSelectorScreenPacket());
             } else {
                 player.sendMessage(ComponentUtil.createTranslated("§cNo usages left!"), UUID.randomUUID());
             }
         }
 
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static void openScreen() {
-        Minecraft.getInstance().setScreen(new KitSelectionScreen());
     }
 
     public static void updateLore(ItemStack stack, int max, int left) {

@@ -218,7 +218,7 @@ tasks.withType(JavaCompile).configureEach {
 modrinth {
     token = modrinthToken
     projectId = modrinth_proj_id
-    uploadFile = reobfJar
+    uploadFile = tasks.named("jar")
     gameVersions = ['1.18', '1.18.1', '1.18.2']
     loaders = ['forge']
 }
