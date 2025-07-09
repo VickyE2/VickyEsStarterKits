@@ -140,6 +140,7 @@ public class StarterKits {
                     }
                 });
             }
+
             serverPlayer.getCapability(ClaimedKitsProvider.CLAIMED_KITS_CAPABILITY).ifPresent(cap -> {
                 var claimed = cap.getClaimedKits();
                 PacketHandler.INSTANCE.sendTo(

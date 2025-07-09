@@ -31,6 +31,7 @@ public class ClaimedKitsStorage {
             tag.putString("Kit_" + index++, kit);
         }
         tag.putInt("Count", claimedKits.size());
+        tag.putBoolean("HasGottenItem", hasGottenFirstJoinKit);
         return tag;
     }
 
@@ -40,6 +41,7 @@ public class ClaimedKitsStorage {
         for (int i = 0; i < count; i++) {
             claimedKits.add(tag.getString("Kit_" + i));
         }
+        hasGottenFirstJoinKit = tag.getBoolean("HasGottenItem");
     }
 
     public Set<String> getClaimedKits() {
