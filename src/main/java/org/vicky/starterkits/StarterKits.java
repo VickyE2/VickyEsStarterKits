@@ -21,6 +21,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +35,7 @@ import org.vicky.starterkits.logic.GiveSelectorMode;
 import org.vicky.starterkits.network.PacketHandler;
 import org.vicky.starterkits.network.packets.KitListPacket;
 import org.vicky.starterkits.network.packets.SyncClaimedKitsPacket;
+import org.vicky.starterkits.network.packets.SyncConfigPacket;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -121,6 +123,16 @@ public class StarterKits {
                     new KitListPacket(new ArrayList<>(kits)),
                     serverPlayer.connection.connection,
                     NetworkDirection.PLAY_TO_CLIENT
+            );
+            PacketHandler.INSTANCE.send(
+                    PacketDistributor.PLAYER.with(() -> serverPlayer),
+                    new SyncConfigPacket(
+                            StarterKitsConfig.COMMON.kitSelectorItemName.get(),
+                            StarterKitsConfig.COMMON.kitSelectorItemLore.get(),
+                            StarterKitsConfig.COMMON.kitMaxUsages.get(),
+                            StarterKitsConfig.COMMON.kitIsSelectable.get(),
+                            StarterKitsConfig.COMMON.allowRollableKits.get()
+                    )
             );
 
             var item = makeKitSelectorItem(

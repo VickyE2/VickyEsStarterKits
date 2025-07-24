@@ -35,7 +35,12 @@ public class PacketHandler {
                 .decoder(SyncClaimedKitsPacket::decode)
                 .consumer(SyncClaimedKitsPacket::handle)
                 .add();
-        INSTANCE.messageBuilder(OpenKitSelectorScreenPacket.class, packetId++)
+        INSTANCE.messageBuilder(SyncConfigPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(SyncConfigPacket::encode)
+                .decoder(SyncConfigPacket::decode)
+                .consumer(SyncConfigPacket::handle)
+                .add();
+        INSTANCE.messageBuilder(OpenKitSelectorScreenPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(OpenKitSelectorScreenPacket::decode)
                 .encoder(OpenKitSelectorScreenPacket::encode)
                 .consumer(OpenKitSelectorScreenPacket::handle)

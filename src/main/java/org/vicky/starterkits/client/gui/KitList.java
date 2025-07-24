@@ -2,14 +2,17 @@ package org.vicky.starterkits.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import org.jetbrains.annotations.Nullable;
 import org.vicky.starterkits.data.Kit;
 
 import java.util.List;
 
 public class KitList extends ContainerObjectSelectionList<KitListEntry> {
+    private final boolean allowSelection;
 
-    public KitList(Minecraft mc, int width, int height, int top, int bottom, int slotHeight) {
+    public KitList(Minecraft mc, boolean allowSelection, int width, int height, int top, int bottom, int slotHeight) {
         super(mc, width, height, top, bottom, slotHeight);
+        this.allowSelection = allowSelection;
     }
 
     public void setEntries(List<Kit> kits) {
@@ -22,6 +25,24 @@ public class KitList extends ContainerObjectSelectionList<KitListEntry> {
     public void tick() {
         for (KitListEntry entry : this.children()) {
             entry.tick();
+        }
+    }
+
+    @Nullable
+    @Override
+    public KitListEntry getSelected() {
+        if (allowSelection) {
+            return super.getSelected();
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Override
+    public void setSelected(@Nullable KitListEntry p_93462_) {
+        if (allowSelection) {
+            super.setSelected(p_93462_);
         }
     }
 

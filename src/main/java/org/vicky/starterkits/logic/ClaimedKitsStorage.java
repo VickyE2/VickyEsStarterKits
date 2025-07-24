@@ -1,6 +1,8 @@
 package org.vicky.starterkits.logic;
 
 import net.minecraft.nbt.CompoundTag;
+import org.vicky.starterkits.config.StarterKitsConfig;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +47,11 @@ public class ClaimedKitsStorage {
     }
 
     public Set<String> getClaimedKits() {
-        return new HashSet<>(claimedKits);
+        if (!StarterKitsConfig.COMMON.allowInfiniteKits.get()) {
+            return new HashSet<>(claimedKits);
+        }
+        else {
+            return new HashSet<>();
+        }
     }
 }

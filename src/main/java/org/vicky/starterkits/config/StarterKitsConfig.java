@@ -24,6 +24,9 @@ public class StarterKitsConfig {
         public final ForgeConfigSpec.ConfigValue<Integer> kitMaxUsages;
         public final ForgeConfigSpec.ConfigValue<Boolean> kitIsSelectable;
         public final ForgeConfigSpec.ConfigValue<Boolean> allowRollableKits;
+        public final ForgeConfigSpec.ConfigValue<Boolean> breakKitSelector;
+        public final ForgeConfigSpec.ConfigValue<Boolean> breakSelectorOnRandomConfirm;
+        public final ForgeConfigSpec.ConfigValue<Boolean> allowInfiniteKits;
 
         public CommonConfig(ForgeConfigSpec.Builder builder) {
             builder.push("General");
@@ -39,6 +42,15 @@ public class StarterKitsConfig {
             allowRollableKits = builder
                     .comment("Allow players to roll random kit even when not enforced")
                     .define("allowRollableKits", true);
+            breakKitSelector = builder
+                    .comment("Enables the ability of the selector item to break when usages exhausted")
+                    .define("breakKitSelector", true);
+            breakSelectorOnRandomConfirm = builder
+                    .comment("Enables the ability of the selector item to break when a random roll is confirmed denying any other roll chances.")
+                    .define("breakSelectorOnRandomConfirm", false);
+            allowInfiniteKits = builder
+                    .comment("Removes the capability of players claiming a kit once.")
+                    .define("allowInfiniteKits", false);
             builder.pop();
             builder.push("SelectorItem");
             kitSelectorItemName = builder

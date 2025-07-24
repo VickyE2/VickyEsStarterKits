@@ -25,7 +25,7 @@ public class RandomKitConfirmationScreen extends Screen {
 
     @Override
     protected void init() {
-        this.kitList = new KitList(Minecraft.getInstance(), this.width, this.height, 40, this.height - 40, 54);
+        this.kitList = new KitList(Minecraft.getInstance(), false, this.width, this.height, 40, this.height - 40, 54);
         this.kitList.setEntries(List.of(kit));
 
         this.addRenderableWidget(kitList);
@@ -59,7 +59,7 @@ public class RandomKitConfirmationScreen extends Screen {
     private void confirmSelection() {
         var kitName = kit.name;
         org.vicky.starterkits.network.PacketHandler.INSTANCE.sendToServer(
-                new ChooseKitPacket(kitName, false)
+                new ChooseKitPacket(kitName, false, true)
         );
         this.onClose();
     }
@@ -69,7 +69,7 @@ public class RandomKitConfirmationScreen extends Screen {
         super.onClose();
         if (rollsLeft < 1) {
             org.vicky.starterkits.network.PacketHandler.INSTANCE.sendToServer(
-                    new ChooseKitPacket(kit.name, false)
+                    new ChooseKitPacket(kit.name, false, true)
             );
         }
     }

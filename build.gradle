@@ -228,10 +228,28 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
+import com.modrinth.minotaur.dependencies.ModDependency
 modrinth {
     token = modrinthToken
     projectId = modrinth_proj_id
     uploadFile = tasks.named("jar")
     gameVersions = ['1.18', '1.18.1', '1.18.2']
     loaders = ['forge']
+    status = "BETA"
+    changelog = """
+# Version 0.0.3 - ARI
+- Fixed Random kit selection item not breaking kit-selector when usages had been exhausted due to packet mis alignment. (major bug)
+- Added config option `breakKitSelector` to toggle the kit-selector item breaking feature when usages exhausted. (minor affix)
+- Added the ability to specify in config `breakSelectorOnRandomConfirm` to break the selector when a random roll is confirmed. (minor affix)
+- Added tooltip position adjustment of items in kit selection screen as they sometimes go below the screen for items with long tooltips. (minor affix)
+- Added hover indicator for unclaimable kits removing what was at the left edge of the kit previously. (minor affix)
+- Added the option to enable infinite claiming of kits. (minor affix)
+- Fixed bug where in random selection result user could click kits. (minor bug)
+- Fixed server bug when trying to open starter kit item (minor bug)
+- Fixed syncing of config from client to server. (forgotten implementation)
+"""
+    dependencies = [
+            new ModDependency('vvuO3ImH', 'optional'),
+            new ModDependency('Xg35A4rS', 'optional')
+    ]
 }

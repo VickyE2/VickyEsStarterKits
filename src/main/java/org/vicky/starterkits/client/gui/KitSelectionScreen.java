@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.player.Player;
+import org.vicky.starterkits.client.ClientConfigHolder;
 import org.vicky.starterkits.client.ClientKitManager;
 import org.vicky.starterkits.client.ComponentUtil;
 import org.vicky.starterkits.config.StarterKitsConfig;
@@ -14,7 +15,7 @@ import org.vicky.starterkits.network.packets.RequestRandomKitPacket;
 import java.util.List;
 
 public class KitSelectionScreen extends Screen {
-    public static final boolean allowConfirmRollable = StarterKitsConfig.COMMON.kitIsSelectable.get() && StarterKitsConfig.COMMON.allowRollableKits.get();
+    public static final boolean allowConfirmRollable = ClientConfigHolder.kitIsSelectable && ClientConfigHolder.allowRollableKits;
     private KitList kitList;
 
     public KitSelectionScreen() {
@@ -23,7 +24,7 @@ public class KitSelectionScreen extends Screen {
 
     @Override
     protected void init() {
-        this.kitList = new KitList(Minecraft.getInstance(), this.width, this.height, 40, this.height - 40, 54);
+        this.kitList = new KitList(Minecraft.getInstance(), true, this.width, this.height, 40, this.height - 40, 54);
         this.kitList.setEntries(ClientKitManager.INSTANCE.getKits());
         this.addRenderableWidget(new net.minecraft.client.gui.components.Button(
                 this.width - 50, this.height - 50, 100, 20,
@@ -42,9 +43,9 @@ public class KitSelectionScreen extends Screen {
         }
         this.addRenderableWidget(new net.minecraft.client.gui.components.Button(
                 startX, this.height - 30, 100, 20,
-                StarterKitsConfig.COMMON.kitIsSelectable.get() ? ComponentUtil.createTranslated("Confirm") : ComponentUtil.createTranslated("Get Random"),
+                ClientConfigHolder.kitIsSelectable ? ComponentUtil.createTranslated("Confirm") : ComponentUtil.createTranslated("Get Random"),
                 btn -> {
-                    if (StarterKitsConfig.COMMON.kitIsSelectable.get()) {
+                    if (ClientConfigHolder.kitIsSelectable) {
                         confirmSelection();
                     }
                     else {
@@ -71,7 +72,7 @@ public class KitSelectionScreen extends Screen {
         if (selected != null) {
             var kitName = selected.kit.name;
             org.vicky.starterkits.network.PacketHandler.INSTANCE.sendToServer(
-                    new ChooseKitPacket(kitName, true)
+                    new ChooseKitPacket(kitName, true, false)
             );
             this.onClose();
         }

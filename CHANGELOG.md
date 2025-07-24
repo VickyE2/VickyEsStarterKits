@@ -1,3 +1,17 @@
+# Version 0.0.4 - ARI
+- 
+
+# Version 0.0.3 - ARI
+- Fixed Random kit selection item not breaking kit-selector when usages had been exhausted due to packet mis alignment. (major bug)
+- Added config option `breakKitSelector` to toggle the kit-selector item breaking feature when usages exhausted. (minor affix)
+- Added the ability to specify in config `breakSelectorOnRandomConfirm` to break the selector when a random roll is confirmed. (minor affix)
+- Added tooltip position adjustment of items in kit selection screen as they sometimes go below the screen for items with long tooltips. (minor affix)
+- Added hover indicator for unclaimable kits removing what was at the left edge of the kit previously. (minor affix)
+- Added the option to enable infinite claiming of kits. (minor affix)
+- Fixed bug where in random selection result user could click kits. (minor bug)
+- Fixed server bug when trying to open starter kit item (minor bug)
+- Fixed syncing of config from client to server. (forgotten implementation)
+
 # Version 0.0.2 - ARI
 - Fixed mis-rendered selected object in kit creation screen (minor fix)
 - Made default selected color white to make default test color (minor fix)

@@ -4,22 +4,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
-import org.vicky.starterkits.StarterKits;
 import org.vicky.starterkits.client.ComponentUtil;
-import org.vicky.starterkits.client.gui.KitCreationScreen;
-import org.vicky.starterkits.client.gui.KitSelectionScreen;
 import org.vicky.starterkits.network.PacketHandler;
 import org.vicky.starterkits.network.packets.OpenKitSelectorScreenPacket;
 
@@ -64,10 +57,10 @@ public class KitSelectorItem extends Item {
         float percent = (left / (float) max);
 
         String color = "§a"; // green
-        if (percent < 0.2f) color = "§c"; // red
-        else if (percent < 0.6f) color = "§6"; // orange
+        if (percent < 0.6f) color = "§c"; // red
+        else if (percent < 0.8f) color = "§6"; // orange
 
-        loreTag.add(StringTag.valueOf("{\"text\":\"§6Max Usages: " + max + "\"}"));
+        loreTag.add(StringTag.valueOf("{\"text\":\"\"}"));
         loreTag.add(StringTag.valueOf("{\"text\":\"" + color + "Usages Left: " + left + "\"}"));
 
         displayTag.put("Lore", loreTag);

@@ -142,7 +142,7 @@ public class DefaultInits {
         for (Component c : loreComponents) {
             loreTag.add(StringTag.valueOf(Component.Serializer.toJson(c)));
         }
-        loreTag.add(StringTag.valueOf("{\"text\":\"§6Max Usages: " + maxUsages + "\"}"));
+        loreTag.add(StringTag.valueOf("{\"text\":\"\"}"));
         loreTag.add(StringTag.valueOf("{\"text\":\"§6Usages Left: " + maxUsages + "\"}"));
         stack.getOrCreateTagElement("display").put("Lore", loreTag);
         CompoundTag tag = stack.getOrCreateTag();

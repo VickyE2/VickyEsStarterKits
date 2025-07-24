@@ -21,6 +21,7 @@ import org.vicky.starterkits.data.Kit;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntry> {
     public final Kit kit;
@@ -43,21 +44,18 @@ public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntr
         int iconY = y + 30;
         if (blinkTicksRemaining > 0 && blinkOn) {
             Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_BASS, 1.0F, 0.5F);
-            GuiComponent.fill(poseStack, x, y + 4, x + width + 4, y + 50, 0x88FF0000);
+            GuiComponent.fill(poseStack, x - 30, y + 4, x + width + 34, y + 50, 0x88FF0000);
         } else if (list.getSelected() == this) {
             GuiComponent.fill(poseStack, x, y + (height / 2) - 10,  x + 20, y + (height / 2) + 10, 0xFF00AA00);
         }
 
-        boolean isInSquareTooltip = mouseX >= x && mouseX <= x + 20 && mouseY >= y + (height / 2) - 10 && mouseY <= y + (height / 2) + 10;
         if (!kit.canClaimKit(mc.player)) {
-            drawX(poseStack, 255, 190, 0, x + 10, height/2 + 10, height);
-            if (isInSquareTooltip) {
+            if (hovered) {
                 mc.screen.renderTooltip(poseStack, List.of(ComponentUtil.colorize("§6You don't have sufficient permissions for this kit.")), java.util.Optional.empty(), mouseX, mouseY);
             }
         }
         if (ClientClaimedKitsManager.INSTANCE.isClaimed(kit.name)) {
-            drawX(poseStack, 255, 0, 0, x + 10, height/2 - 30, height);
-            if (isInSquareTooltip) {
+            if (hovered) {
                 mc.screen.renderTooltip(poseStack, List.of(ComponentUtil.colorize("§cYou have already claimed this kit.")), java.util.Optional.empty(), mouseX, mouseY);
             }
         }
@@ -93,7 +91,26 @@ public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntr
             kitTooltip.add(ComponentUtil.createTranslated(""));
             kitTooltip.add(ComponentUtil.createTranslated("§o§bThis is equipped in the " + slotItem.slot + " slot"));
             if (mouseX >= iconX && mouseX <= iconX + 16 && mouseY >= iconY && mouseY <= iconY + 16) {
-                mc.screen.renderTooltip(poseStack, kitTooltip, java.util.Optional.empty(), mouseX, mouseY);
+                int screenWidth = mc.getWindow().getGuiScaledWidth();
+                int screenHeight = mc.getWindow().getGuiScaledHeight();
+                // Estimate tooltip width & height using font
+                int tooltipWidth = kitTooltip.stream()
+                        .mapToInt(mc.font::width)
+                        .max().orElse(0) + 8; // add padding
+
+                int tooltipHeight = kitTooltip.size() * 10; // rough estimate; depends on font line height
+                // Adjust X/Y if needed
+                int tooltipX = mouseX;
+                int tooltipY = mouseY;
+
+                if (tooltipX + tooltipWidth > screenWidth) {
+                    tooltipX = screenWidth - tooltipWidth;
+                }
+                if (tooltipY + tooltipHeight > screenHeight) {
+                    tooltipY = screenHeight - tooltipHeight;
+                }
+                // Finally render
+                mc.screen.renderTooltip(poseStack, kitTooltip, Optional.empty(), tooltipX, tooltipY);
             }
             iconX += 18;
         }

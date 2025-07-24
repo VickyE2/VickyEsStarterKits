@@ -9,6 +9,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 import org.vicky.starterkits.StarterKits;
 import org.vicky.starterkits.client.ComponentUtil;
+import org.vicky.starterkits.config.StarterKitsConfig;
 import org.vicky.starterkits.data.Kit;
 import org.vicky.starterkits.logic.ClaimedKitsProvider;
 import org.vicky.starterkits.network.PacketHandler;
@@ -29,27 +30,29 @@ public record RequestRandomKitPacket() {
         ctx.get().enqueueWork(() -> {
             var player = ctx.get().getSender();
             if (player != null) {
-                player.getCapability(ClaimedKitsProvider.CLAIMED_KITS_CAPABILITY).ifPresent(store -> {
-                    ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-                    CompoundTag tag = stack.getOrCreateTag();
-                    int left = tag.getInt("UsesLeft");
-                    if (left > 0) {
-                        --left;
-                        Kit kit = StarterKits.KIT_DATA.getRandomKit(player);
-                        if (kit != null) {
-                            tag.putInt("UsesLeft", left);
-
-                            PacketHandler.INSTANCE.send(
-                                    PacketDistributor.PLAYER.with(() -> player),
-                                    new RandomKitSelectionResultPacket(kit.name, left)
-                            );
-                        } else {
-                            player.sendMessage(ComponentUtil.createTranslated("§cNo kits available!"), player.getUUID());
-                        }
+                ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+                CompoundTag tag = stack.getOrCreateTag();
+                int left = tag.getInt("UsesLeft");
+                int max = tag.getInt("MaxUses");
+                if (left > 0) {
+                    left--;
+                    Kit kit = StarterKits.KIT_DATA.getRandomKit(player);
+                    if (kit != null) {
+                        left--;
+                        if (StarterKitsConfig.COMMON.breakKitSelector.get())
+                            stack.setDamageValue(left / max);
+                        tag.putInt("UsesLeft", left);
+                        updateLore(stack, 0, left);
+                        PacketHandler.INSTANCE.send(
+                                PacketDistributor.PLAYER.with(() -> player),
+                                new RandomKitSelectionResultPacket(kit.name, left)
+                        );
                     } else {
-                        player.sendMessage(ComponentUtil.createTranslated("§cNo usages left!"), player.getUUID());
+                        player.sendMessage(ComponentUtil.createTranslated("§cNo kits available!"), player.getUUID());
                     }
-                });
+                } else {
+                    player.sendMessage(ComponentUtil.createTranslated("§cNo usages left!"), player.getUUID());
+                }
             }
         });
         ctx.get().setPacketHandled(true);

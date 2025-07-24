@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 import org.vicky.starterkits.client.ComponentUtil;
+import org.vicky.starterkits.config.StarterKitsConfig;
 import org.vicky.starterkits.logic.ClaimedKitsProvider;
 import org.vicky.starterkits.network.PacketHandler;
 
@@ -15,15 +16,16 @@ import java.util.function.Supplier;
 
 import static org.vicky.starterkits.items.KitSelectorItem.updateLore;
 
-public record ChooseKitPacket(String kitName, boolean shouldDegrade) {
+public record ChooseKitPacket(String kitName, boolean shouldDegrade, boolean isRandom) {
 
     public static void encode(ChooseKitPacket pkt, FriendlyByteBuf buf) {
         buf.writeUtf(pkt.kitName);
-        buf.writeBoolean(pkt.shouldDegrade());
+        buf.writeBoolean(pkt.shouldDegrade);
+        buf.writeBoolean(pkt.isRandom);
     }
 
     public static ChooseKitPacket decode(FriendlyByteBuf buf) {
-        return new ChooseKitPacket(buf.readUtf(), buf.readBoolean());
+        return new ChooseKitPacket(buf.readUtf(), buf.readBoolean(), buf.readBoolean());
     }
 
     public static void handle(ChooseKitPacket pkt, Supplier<NetworkEvent.Context> ctx) {
@@ -35,15 +37,16 @@ public record ChooseKitPacket(String kitName, boolean shouldDegrade) {
                         store.claimKit(pkt.kitName);
                         PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncClaimedKitsPacket(store.getClaimedKits().stream().toList()));
                         org.vicky.starterkits.StarterKits.KIT_DATA.giveKitToPlayer(player, pkt.kitName);
+                        ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
                         if (pkt.shouldDegrade) {
-                            ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
                             CompoundTag tag = stack.getOrCreateTag();
                             int max = tag.getInt("MaxUses");
                             int left = tag.getInt("UsesLeft");
 
                             if (left > 0) {
                                 left--;
-                                stack.setDamageValue(left / max);
+                                if (StarterKitsConfig.COMMON.breakKitSelector.get())
+                                    stack.setDamageValue(left / max);
                                 tag.putInt("UsesLeft", left);
                                 updateLore(stack, max, left);
 
@@ -52,6 +55,9 @@ public record ChooseKitPacket(String kitName, boolean shouldDegrade) {
                                     player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                                 }
                             }
+                        }
+                        if (pkt.isRandom && StarterKitsConfig.COMMON.breakSelectorOnRandomConfirm.get()) {
+                            stack.setDamageValue(stack.getDamageValue());
                         }
                     } else {
                         player.sendMessage(ComponentUtil.createTranslated("You already claimed this kit!"), player.getUUID());

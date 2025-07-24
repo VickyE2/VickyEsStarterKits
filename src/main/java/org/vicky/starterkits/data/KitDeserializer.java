@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class KitDeserializer implements JsonDeserializer<Kit> {
-    public static final boolean DEBUG = true; // I might add this to the configs instead...
+    public static final boolean DEBUG = false; // I might add this to the configs instead...
 
     @Override
     public Kit deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
