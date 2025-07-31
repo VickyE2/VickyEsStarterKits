@@ -9,9 +9,17 @@ import java.util.Set;
 public class ClaimedKitsStorage {
     private final Set<String> claimedKits = new HashSet<>();
     private boolean hasGottenFirstJoinKit = false;
+    private boolean hasRolledOnceAndClaimed = false;
 
     public boolean hasClaimed(String kitName) {
-        return claimedKits.contains(kitName);
+        if (!StarterKitsConfig.COMMON.allowInfiniteKits.get()) {
+            return claimedKits.contains(kitName);
+        }
+        return false;
+    }
+
+    public boolean hasRolledOnceAndClaimed() {
+        return hasRolledOnceAndClaimed;
     }
 
     public void claimKit(String kitName) {
@@ -20,6 +28,10 @@ public class ClaimedKitsStorage {
 
     public void setHasGottenFirstJoinKit(boolean hasGottenFirstJoinKit) {
         this.hasGottenFirstJoinKit = hasGottenFirstJoinKit;
+    }
+
+    public void setHasRolledOnceAndClaimed(boolean hasRolledOnceAndClaimed) {
+        this.hasRolledOnceAndClaimed = hasRolledOnceAndClaimed;
     }
 
     public boolean hasGottenFirstJoinKit() {
@@ -34,6 +46,7 @@ public class ClaimedKitsStorage {
         }
         tag.putInt("Count", claimedKits.size());
         tag.putBoolean("HasGottenItem", hasGottenFirstJoinKit);
+        tag.putBoolean("HasRolledOnceAndClaimed", hasRolledOnceAndClaimed);
         return tag;
     }
 
@@ -44,6 +57,7 @@ public class ClaimedKitsStorage {
             claimedKits.add(tag.getString("Kit_" + i));
         }
         hasGottenFirstJoinKit = tag.getBoolean("HasGottenItem");
+        hasRolledOnceAndClaimed = tag.getBoolean("HasRolledOnceAndClaimed");
     }
 
     public Set<String> getClaimedKits() {

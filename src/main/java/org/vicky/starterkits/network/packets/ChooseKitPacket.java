@@ -33,17 +33,17 @@ public record ChooseKitPacket(String kitName, boolean shouldDegrade, boolean isR
             var player = ctx.get().getSender();
             if (player != null) {
                 player.getCapability(ClaimedKitsProvider.CLAIMED_KITS_CAPABILITY).ifPresent(store -> {
+                    store.setHasRolledOnceAndClaimed(true);
                     if (!store.hasClaimed(pkt.kitName)) {
                         store.claimKit(pkt.kitName);
                         PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncClaimedKitsPacket(store.getClaimedKits().stream().toList()));
                         org.vicky.starterkits.StarterKits.KIT_DATA.giveKitToPlayer(player, pkt.kitName);
                         ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+                        CompoundTag tag = stack.getOrCreateTag();
+                        int max = tag.getInt("MaxUses");
+                        int left = tag.getInt("UsesLeft");
                         if (pkt.shouldDegrade) {
-                            CompoundTag tag = stack.getOrCreateTag();
-                            int max = tag.getInt("MaxUses");
-                            int left = tag.getInt("UsesLeft");
-
-                            if (left > 0) {
+                            if (left < 0) {
                                 left--;
                                 if (StarterKitsConfig.COMMON.breakKitSelector.get())
                                     stack.setDamageValue(left / max);
@@ -57,7 +57,7 @@ public record ChooseKitPacket(String kitName, boolean shouldDegrade, boolean isR
                             }
                         }
                         if (pkt.isRandom && StarterKitsConfig.COMMON.breakSelectorOnRandomConfirm.get()) {
-                            stack.setDamageValue(stack.getDamageValue());
+                            stack.shrink(1);
                         }
                     } else {
                         player.sendMessage(ComponentUtil.createTranslated("You already claimed this kit!"), player.getUUID());

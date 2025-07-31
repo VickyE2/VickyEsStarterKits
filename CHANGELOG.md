@@ -1,5 +1,11 @@
 # Version 0.0.4 - ARI
-- 
+- Destroy starter kit on death if "give type" is `ALWAYS` (minor addition)
+- Fixed discriminator packet error on dedicated server (minor affix)
+- Added the ability to reward starter kit `ON_DEATH` in GiveSelectorMode : `giveSelectorMode` in config while also allowing `ALWAYS` to give on death (minor addition)
+- Updated kit list command to be more informative (minor addition)
+- Fixed kit usages not updating (minor affix)
+- Deletes kit from existence if its on `ALWAYS` or `ON_DEATH` or `ON_DEATH_NOT_CLAIMED` (minor addition)
+- `ON_DEATH_NOT_CLAIMED` only give on death if has never claimed or spun (minor addition)
 
 # Version 0.0.3 - ARI
 - Fixed Random kit selection item not breaking kit-selector when usages had been exhausted due to packet mis alignment. (major bug)

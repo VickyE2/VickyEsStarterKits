@@ -237,16 +237,14 @@ modrinth {
     loaders = ['forge']
     status = "BETA"
     changelog = """
-# Version 0.0.3 - ARI
-- Fixed Random kit selection item not breaking kit-selector when usages had been exhausted due to packet mis alignment. (major bug)
-- Added config option `breakKitSelector` to toggle the kit-selector item breaking feature when usages exhausted. (minor affix)
-- Added the ability to specify in config `breakSelectorOnRandomConfirm` to break the selector when a random roll is confirmed. (minor affix)
-- Added tooltip position adjustment of items in kit selection screen as they sometimes go below the screen for items with long tooltips. (minor affix)
-- Added hover indicator for unclaimable kits removing what was at the left edge of the kit previously. (minor affix)
-- Added the option to enable infinite claiming of kits. (minor affix)
-- Fixed bug where in random selection result user could click kits. (minor bug)
-- Fixed server bug when trying to open starter kit item (minor bug)
-- Fixed syncing of config from client to server. (forgotten implementation)
+# Version 0.0.4 - ARI
+- Destroy starter kit on death if "give type" is `ALWAYS` (minor addition)
+- Fixed discriminator packet error on dedicated server (minor affix)
+- Added the ability to reward starter kit `ON_DEATH` in GiveSelectorMode : `giveSelectorMode` in config while also allowing `ALWAYS` to give on death (minor addition)
+- Updated kit list command to be more informative (minor addition)
+- Fixed kit usages not updating (minor affix)
+- Deletes kit from existence if its on `ALWAYS` or `ON_DEATH` or `ON_DEATH_NOT_CLAIMED` (minor addition)
+- `ON_DEATH_NOT_CLAIMED` only give on death if has never claimed or spun (minor addition)
 """
     dependencies = [
             new ModDependency('vvuO3ImH', 'optional'),

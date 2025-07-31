@@ -25,6 +25,8 @@ public class RandomKitConfirmationScreen extends Screen {
 
     @Override
     protected void init() {
+        super.init();
+
         this.kitList = new KitList(Minecraft.getInstance(), false, this.width, this.height, 40, this.height - 40, 54);
         this.kitList.setEntries(List.of(kit));
 
@@ -35,10 +37,10 @@ public class RandomKitConfirmationScreen extends Screen {
                 this.width / 2 - 50, this.height - 60, 100, 20,
                 ComponentUtil.createTranslated("Retries left: " + rollsLeft),
                 btn -> {
+                    onClose();
                     org.vicky.starterkits.network.PacketHandler.INSTANCE.sendToServer(
                             new RequestRandomKitPacket()
                     );
-                    onClose();
                 }
         );
         retryButton.active = rollsLeft > 0;

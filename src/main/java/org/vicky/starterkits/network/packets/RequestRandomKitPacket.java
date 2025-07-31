@@ -19,12 +19,8 @@ import java.util.function.Supplier;
 import static org.vicky.starterkits.items.KitSelectorItem.updateLore;
 
 public record RequestRandomKitPacket() {
-
     public static void encode(RequestRandomKitPacket pkt, FriendlyByteBuf buf) {}
-
-    public static RequestRandomKitPacket decode(FriendlyByteBuf buf) {
-        return new RequestRandomKitPacket();
-    }
+    public static RequestRandomKitPacket decode(FriendlyByteBuf buf) {return new RequestRandomKitPacket();}
 
     public static void handle(RequestRandomKitPacket pkt, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
@@ -35,7 +31,6 @@ public record RequestRandomKitPacket() {
                 int left = tag.getInt("UsesLeft");
                 int max = tag.getInt("MaxUses");
                 if (left > 0) {
-                    left--;
                     Kit kit = StarterKits.KIT_DATA.getRandomKit(player);
                     if (kit != null) {
                         left--;

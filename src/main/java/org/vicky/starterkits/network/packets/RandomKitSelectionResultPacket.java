@@ -6,8 +6,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import org.vicky.starterkits.StarterKits;
+import org.vicky.starterkits.client.ClientPacketHandlers;
 import org.vicky.starterkits.client.ComponentUtil;
 import org.vicky.starterkits.client.gui.KitSelectionScreen;
 import org.vicky.starterkits.client.gui.RandomKitConfirmationScreen;
@@ -30,15 +33,9 @@ public record RandomKitSelectionResultPacket(String kitName, int rollsLeft) {
     }
 
     public static void handle(RandomKitSelectionResultPacket pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            if (Minecraft.getInstance().player != null) {
-                var kit = StarterKits.KIT_DATA.getKit(pkt.kitName);
-                if (kit != null)
-                    Minecraft.getInstance().setScreen(new RandomKitConfirmationScreen(kit, pkt.rollsLeft));
-                else
-                    Minecraft.getInstance().player.sendMessage(ComponentUtil.createTranslated("A sever desync error has occurred. please retry"), Minecraft.getInstance().player.getUUID());
-            }
-        });
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            ClientPacketHandlers.openRandomKitSelectionResultScreen(pkt.kitName, pkt.rollsLeft);
+        }));
         ctx.get().setPacketHandled(true);
     }
 }

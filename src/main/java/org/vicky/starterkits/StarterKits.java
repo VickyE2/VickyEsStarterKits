@@ -6,11 +6,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -39,9 +41,11 @@ import org.vicky.starterkits.network.packets.SyncConfigPacket;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.vicky.starterkits.init.DefaultInits.makeKitSelectorItem;
+import static org.vicky.starterkits.init.ModItems.ITEMS;
 import static org.vicky.starterkits.init.ModItems.KIT_SELECTOR;
 
 @Mod(StarterKits.MOD_ID)
@@ -89,6 +93,7 @@ public class StarterKits {
         event.enqueueWork(defaultInits::ensureDefaultKits);
         event.enqueueWork(PacketHandler::register);
     }
+
     @SubscribeEvent
     public void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player) {
@@ -96,12 +101,15 @@ public class StarterKits {
                     new ClaimedKitsProvider());
         }
     }
+
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        ServerPlayer player = event.getServer().getPlayerList().getPlayerByName("Dev");
-        if (player != null) {
-            event.getServer().getPlayerList().op(player.getGameProfile());
-        }
+    public void onLivingDrops(LivingDropsEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer)) return;
+        if (!(StarterKitsConfig.COMMON.giveSelectorMode.get().equals(GiveSelectorMode.ON_DEATH) ||
+              StarterKitsConfig.COMMON.giveSelectorMode.get().equals(GiveSelectorMode.ALWAYS) ||
+              StarterKitsConfig.COMMON.giveSelectorMode.get().equals(GiveSelectorMode.ON_DEATH_NOT_CLAIMED))
+        ) return;
+        event.getDrops().removeIf(itemEntity -> KIT_SELECTOR.get() == itemEntity.getItem().getItem());
     }
 
     @SubscribeEvent
@@ -109,6 +117,28 @@ public class StarterKits {
         event.getOriginal().getCapability(ClaimedKitsProvider.CLAIMED_KITS_CAPABILITY).ifPresent(oldStore ->
                 event.getEntity().getCapability(ClaimedKitsProvider.CLAIMED_KITS_CAPABILITY).ifPresent(newStore ->
                         newStore.loadNBT(oldStore.saveNBT())));
+
+        if(event.isWasDeath()) {
+            var item = makeKitSelectorItem(
+                    ForgeRegistries.ITEMS.getValue(new ResourceLocation(MOD_ID, "kit_selector")),
+                    StarterKitsConfig.COMMON.kitSelectorItemName.get(),
+                    StarterKitsConfig.COMMON.kitSelectorItemLore.get(),
+                    StarterKitsConfig.COMMON.kitMaxUsages.get()
+            );
+            if (StarterKitsConfig.COMMON.giveSelectorMode.get() == GiveSelectorMode.ON_DEATH_NOT_CLAIMED) {
+                event.getEntity().getCapability(ClaimedKitsProvider.CLAIMED_KITS_CAPABILITY).ifPresent(storage -> {
+                    if (event.getEntity() instanceof ServerPlayer player && !storage.hasRolledOnceAndClaimed())
+                        player.getInventory().add(item);
+                });
+            }
+            else if (StarterKitsConfig.COMMON.giveSelectorMode.get() == GiveSelectorMode.ON_DEATH
+                    || StarterKitsConfig.COMMON.giveSelectorMode.get() == GiveSelectorMode.ALWAYS) {
+                event.getEntity().getCapability(ClaimedKitsProvider.CLAIMED_KITS_CAPABILITY).ifPresent(storage -> {
+                    if (event.getEntity() instanceof ServerPlayer player)
+                        player.getInventory().add(item);
+                });
+            }
+        }
     }
 
     @SubscribeEvent
@@ -144,7 +174,7 @@ public class StarterKits {
 
             if (StarterKitsConfig.COMMON.giveSelectorMode.get() == GiveSelectorMode.ALWAYS) {
                 serverPlayer.getInventory().add(item);
-            } else if (StarterKitsConfig.COMMON.giveSelectorMode.get() == GiveSelectorMode.ONCE) {
+            } else if (StarterKitsConfig.COMMON.giveSelectorMode.get() == GiveSelectorMode.ONCE || StarterKitsConfig.COMMON.giveSelectorMode.get() == GiveSelectorMode.ON_DEATH) {
                 serverPlayer.getCapability(ClaimedKitsProvider.CLAIMED_KITS_CAPABILITY).ifPresent(storage -> {
                     if (!storage.hasGottenFirstJoinKit()) {
                         storage.setHasGottenFirstJoinKit(true);

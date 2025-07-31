@@ -1,21 +1,17 @@
 package org.vicky.starterkits.logic;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.vicky.starterkits.StarterKits;
 import org.vicky.starterkits.client.ComponentUtil;
 import org.vicky.starterkits.config.StarterKitsConfig;
-
-import java.nio.file.Path;
 
 import static org.vicky.starterkits.StarterKits.MOD_ID;
 import static org.vicky.starterkits.init.DefaultInits.makeKitSelectorItem;
@@ -39,7 +35,28 @@ public class CommandEvents {
                         .then(Commands.literal("list")
                                 .executes(ctx -> {
                                     var kits = StarterKits.KIT_DATA.getAllKits();
-                                    ctx.getSource().sendSuccess(ComponentUtil.colorize("§aAvailable kits: " + kits.size()), false);
+                                    StringBuilder builder = new StringBuilder();
+                                    for (var kit : kits) {
+                                        builder.append("\nKit: ").append(kit.name)
+                                                .append("\nDescription: ").append(kit.description)
+                                                .append("\nChance in weight (1 is lowest): ").append(kit.weight)
+                                                .append("\nItems: ");
+                                        if (kit.items.isEmpty()) builder.append("\n  none");
+                                        for (var item : kit.items) {
+                                            builder.append("\n  ").append(ComponentUtil.createTranslated(item.item).getString());
+                                        }
+                                        builder.append("\nSlotables: ");
+                                        if (kit.slotables.isEmpty()) builder.append("\n  none");
+                                        for (var slota : kit.slotables) {
+                                            builder.append("\n  ").append(ComponentUtil.createTranslated(slota.item).getString());
+                                        }
+                                        builder.append("\nPermissions: ");
+                                        if (kit.requiredPermissions.isEmpty()) builder.append("\n  none");
+                                        for (var perm : kit.requiredPermissions) {
+                                            builder.append("\n  ").append(perm);
+                                        }
+                                    }
+                                    ctx.getSource().sendSuccess(ComponentUtil.colorize("§aAvailable kits: " + kits.size() + builder), false);
                                     return 1;
                                 })
                         )

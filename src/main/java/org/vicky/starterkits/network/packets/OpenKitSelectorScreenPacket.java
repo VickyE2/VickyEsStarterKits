@@ -21,7 +21,6 @@ public class OpenKitSelectorScreenPacket {
         ctx.get().enqueueWork(() -> {
             if (Minecraft.getInstance().player != null) {
                 DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ClientPacketHandlers::openKitSelectionScreen);
-
             }
         });
         ctx.get().setPacketHandled(true);

@@ -1,6 +1,8 @@
 package org.vicky.starterkits.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vicky.starterkits.logic.GiveSelectorMode;
 
@@ -18,20 +20,20 @@ public class StarterKitsConfig {
     }
 
     public static class CommonConfig {
-        public final ForgeConfigSpec.ConfigValue<String> kitSelectorItemName;
-        public final ForgeConfigSpec.ConfigValue<List<String>> kitSelectorItemLore;
-        public final ForgeConfigSpec.EnumValue<GiveSelectorMode> giveSelectorMode;
-        public final ForgeConfigSpec.ConfigValue<Integer> kitMaxUsages;
-        public final ForgeConfigSpec.ConfigValue<Boolean> kitIsSelectable;
-        public final ForgeConfigSpec.ConfigValue<Boolean> allowRollableKits;
-        public final ForgeConfigSpec.ConfigValue<Boolean> breakKitSelector;
-        public final ForgeConfigSpec.ConfigValue<Boolean> breakSelectorOnRandomConfirm;
-        public final ForgeConfigSpec.ConfigValue<Boolean> allowInfiniteKits;
+        public ForgeConfigSpec.ConfigValue<String> kitSelectorItemName;
+        public ForgeConfigSpec.ConfigValue<List<String>> kitSelectorItemLore;
+        public ForgeConfigSpec.EnumValue<GiveSelectorMode> giveSelectorMode;
+        public ForgeConfigSpec.ConfigValue<Integer> kitMaxUsages;
+        public ForgeConfigSpec.ConfigValue<Boolean> kitIsSelectable;
+        public ForgeConfigSpec.ConfigValue<Boolean> allowRollableKits;
+        public ForgeConfigSpec.ConfigValue<Boolean> breakKitSelector;
+        public ForgeConfigSpec.ConfigValue<Boolean> breakSelectorOnRandomConfirm;
+        public ForgeConfigSpec.ConfigValue<Boolean> allowInfiniteKits;
 
         public CommonConfig(ForgeConfigSpec.Builder builder) {
             builder.push("General");
             giveSelectorMode = builder
-                    .comment("When to give the selector: ALWAYS, ONCE, NONE")
+                    .comment("When to give the selector: ALWAYS, ON_DEATH, ONCE, NONE")
                     .defineEnum("giveSelectorMode", GiveSelectorMode.ONCE);
             kitMaxUsages = builder
                     .comment("The number of times a player can use the kit selector to claim kits...")
@@ -62,4 +64,14 @@ public class StarterKitsConfig {
             builder.pop();
         }
     }
+
+    /*
+    @SubscribeEvent
+    void onLoad(final ModConfigEvent event) {
+        if (event.getConfig().getSpec() == StarterKitsConfig.COMMON_SPEC) {
+            System.out.println("[StarterKits] Config reloaded: " + event.getConfig().getFileName());
+            COMMON.kitIsSelectable.set(event.getConfig().getSpec().get());
+        }
+    }
+    */
 }

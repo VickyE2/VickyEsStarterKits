@@ -34,8 +34,8 @@ public class KitSelectionScreen extends Screen {
 
         this.addRenderableWidget(kitList);
         int startX = this.width / 2 - 50;
-        if (allowConfirmRollable) {
-            startX = this.width / 2 - 90;
+        if (allowConfirmRollable && ClientConfigHolder.kitIsSelectable) {
+            startX = this.width / 2 - 100;
             this.addRenderableWidget(new net.minecraft.client.gui.components.Button(
                 startX + 110, this.height - 30, 20, 20, ComponentUtil.createTranslated("↺"),
                 btn -> requestRandomSelection()
