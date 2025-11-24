@@ -1,3 +1,8 @@
+# Version 0.0.5 - AKARI
+- Fixed the capabilities and claimed kits not saving when a player dies, rejoins the world or changes dimensions. This was mainly because the onCLone logic was wrong. It's fixed now tho... (major bug)
+- Added support for 1.20.1 (major addition)
+- 
+
 # Version 0.0.4 - ARI
 - Destroy starter kit on death if "give type" is `ALWAYS` (minor addition)
 - Fixed discriminator packet error on dedicated server (minor affix)
