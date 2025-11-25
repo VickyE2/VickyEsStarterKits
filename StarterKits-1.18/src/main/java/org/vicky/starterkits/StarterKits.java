@@ -53,8 +53,6 @@ import static org.vicky.starterkits.init.ModItems.KIT_SELECTOR;
 public class StarterKits {
 
     public static final String MOD_ID = "starterkits";
-    public static final String MOD_NAME = "Starter Kits";
-    public static final String VERSION = "1.18.2-0.0.1-ALPHA";
     public static Logger LOGGER;
 
     public static KitDataManager KIT_DATA = new KitDataManager();

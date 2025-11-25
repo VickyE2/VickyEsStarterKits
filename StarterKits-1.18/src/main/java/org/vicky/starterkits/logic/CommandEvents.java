@@ -66,7 +66,7 @@ public class CommandEvents {
                                 )
                                 .executes(ctx -> {
                                     var item = makeKitSelectorItem(
-                                            ForgeRegistries.ITEMS.getValue(new ResourceLocation(MOD_ID, "kit_selector")),
+                                            ForgeRegistries.ITEMS.getValue(ResourceLocation.fromNamespaceAndPath(MOD_ID, "kit_selector")),
                                             StarterKitsConfig.COMMON.kitSelectorItemName.get(),
                                             StarterKitsConfig.COMMON.kitSelectorItemLore.get(),
                                             StarterKitsConfig.COMMON.kitMaxUsages.get()

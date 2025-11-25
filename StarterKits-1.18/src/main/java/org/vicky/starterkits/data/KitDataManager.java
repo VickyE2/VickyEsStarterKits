@@ -51,7 +51,7 @@ public class KitDataManager extends SimpleJsonResourceReloadListener {
         Kit kit = kits.get(kitName);
         if (kit != null) {
             for (Kit.KitItem item : kit.items) {
-                ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(item.item)), item.count);
+                ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(item.item)), item.count);
                 if (item.nbt != null && !item.nbt.isEmpty()) {
                     try {
                         stack.setTag(net.minecraft.nbt.TagParser.parseTag(item.nbt));
@@ -61,7 +61,7 @@ public class KitDataManager extends SimpleJsonResourceReloadListener {
             }
             for (Kit.KitSlotable slotable : kit.slotables) {
                 String[] parts = slotable.item.split(":");
-                ResourceLocation itemId = new ResourceLocation(parts[0], parts[1]);
+                ResourceLocation itemId = ResourceLocation.fromNamespaceAndPath(parts[0], parts[1]);
                 int count = parts.length >= 3 ? Integer.parseInt(parts[2]) : 1;
                 ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(itemId), count);
                 if (slotable.nbt != null && !slotable.nbt.isEmpty()) {

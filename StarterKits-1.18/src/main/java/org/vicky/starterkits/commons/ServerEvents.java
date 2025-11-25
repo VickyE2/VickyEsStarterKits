@@ -61,7 +61,7 @@ public class ServerEvents {
     }
 
     @SubscribeEvent
-    public void onLivingDrops(LivingDropsEvent event) {
+    public static void onLivingDrops(LivingDropsEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer)) return;
         if (!(StarterKitsConfig.COMMON.giveSelectorMode.get().equals(GiveSelectorMode.ON_DEATH) ||
                 StarterKitsConfig.COMMON.giveSelectorMode.get().equals(GiveSelectorMode.ALWAYS) ||
@@ -112,7 +112,7 @@ public class ServerEvents {
     }
 
     @SubscribeEvent
-    public void onClientJoin(PlayerEvent.PlayerLoggedInEvent event) {
+    public static void onClientJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
 
         KIT_DATA.reloadKitsFromConfigFolder();

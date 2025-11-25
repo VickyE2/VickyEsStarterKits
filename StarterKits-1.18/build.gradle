@@ -1,9 +1,10 @@
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
-sharedGameVersions.clear()
-sharedGameVersions.addAll(['1.18', '1.18.1', '1.18.2'])
-status = "RELEASE"
+ext.sharedGameVersions = []
+ext.sharedGameVersions.addAll(['1.18', '1.18.1', '1.18.2'])
+ext.sharedLoaders = ['forge']
+ext.status = "RELEASE"
 
 minecraft {
     // The mappings can be changed at any time and must be in the following format.

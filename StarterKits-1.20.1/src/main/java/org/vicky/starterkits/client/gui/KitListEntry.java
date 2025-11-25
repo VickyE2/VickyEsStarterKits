@@ -62,7 +62,7 @@ public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntr
         }
 
         for (Kit.KitItem kitItem : kit.items) {
-            ItemStack previewStack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(kitItem.item)), kitItem.count);
+            ItemStack previewStack = new ItemStack(ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(kitItem.item)), kitItem.count);
             if (kitItem.nbt != null && !kitItem.nbt.isEmpty()) {
                 try {
                     previewStack.setTag(net.minecraft.nbt.TagParser.parseTag(kitItem.nbt));

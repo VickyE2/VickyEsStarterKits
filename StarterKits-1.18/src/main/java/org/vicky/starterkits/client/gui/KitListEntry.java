@@ -61,7 +61,7 @@ public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntr
         }
 
         for (Kit.KitItem kitItem : kit.items) {
-            ItemStack previewStack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(kitItem.item)), kitItem.count);
+            ItemStack previewStack = new ItemStack(ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(kitItem.item)), kitItem.count);
             if (kitItem.nbt != null && !kitItem.nbt.isEmpty()) {
                 try {
                     previewStack.setTag(net.minecraft.nbt.TagParser.parseTag(kitItem.nbt));
@@ -77,7 +77,7 @@ public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntr
 
         for (Kit.KitSlotable slotItem : kit.slotables) {
             String[] parts = slotItem.item.split(":");
-            ResourceLocation itemId = new ResourceLocation(parts[0], parts[1]);
+            ResourceLocation itemId = ResourceLocation.fromNamespaceAndPath(parts[0], parts[1]);
             int count = parts.length >= 3 ? Integer.parseInt(parts[2]) : 1;
             ItemStack previewStack = new ItemStack(ForgeRegistries.ITEMS.getValue(itemId), count);
             if (slotItem.nbt != null && !slotItem.nbt.isEmpty()) {

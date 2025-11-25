@@ -3,6 +3,7 @@ package org.vicky.starterkits.items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -13,10 +14,12 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.vicky.starterkits.client.ComponentUtil;
+import org.vicky.starterkits.config.StarterKitsConfig;
 import org.vicky.starterkits.network.PacketHandler;
 import org.vicky.starterkits.network.packets.AutoRollForUser;
 import org.vicky.starterkits.network.packets.OpenKitSelectorScreenPacket;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.vicky.starterkits.client.ClientConfigHolder.autoRollOnRightClick;
@@ -73,5 +76,28 @@ public class KitSelectorItem extends Item {
         loreTag.add(StringTag.valueOf("{\"text\":\"" + color + "Usages Left: " + left + "\"}"));
 
         displayTag.put("Lore", loreTag);
+    }
+
+    @Override
+    public @NotNull ItemStack getDefaultInstance() {
+        ItemStack stack = super.getDefaultInstance();
+        var name = StarterKitsConfig.COMMON.kitSelectorItemName.get();
+        var loreStrings = StarterKitsConfig.COMMON.kitSelectorItemLore.get();
+        var maxUsages = StarterKitsConfig.COMMON.kitMaxUsages.get();
+        stack.setHoverName(ComponentUtil.colorize(name));
+        List<Component> loreComponents = loreStrings.stream()
+                .map(ComponentUtil::colorize)
+                .toList();
+        ListTag loreTag = new ListTag();
+        for (Component c : loreComponents) {
+            loreTag.add(StringTag.valueOf(Component.Serializer.toJson(c)));
+        }
+        loreTag.add(StringTag.valueOf("{\"text\":\"\"}"));
+        loreTag.add(StringTag.valueOf("{\"text\":\"§6Usages Left: " + maxUsages + "\"}"));
+        stack.getOrCreateTagElement("display").put("Lore", loreTag);
+        CompoundTag tag = stack.getOrCreateTag();
+        tag.putInt("MaxUses", maxUsages);
+        tag.putInt("UsesLeft", maxUsages);
+        return stack;
     }
 }

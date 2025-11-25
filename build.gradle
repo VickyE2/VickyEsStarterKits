@@ -10,7 +10,7 @@ plugins {
 
 ext.sharedGameVersions = []
 ext.sharedLoaders = ['forge']
-ext.status = "BETA"
+ext.statusF = "BETA"
 
 allprojects {
     apply plugin: 'eclipse'
@@ -47,31 +47,37 @@ allprojects {
         }
         mavenCentral()
     }
+}
 
+subprojects {
+    afterEvaluate { p ->
+        if (p.plugins.hasPlugin('com.modrinth.minotaur')) {
+            def modrinthToken = System.getenv("MODRINTH_TOKEN")
 
+            if (!modrinthToken) {
+                throw new GradleException("Missing environment variable: MODRINTH_TOKEN")
+            }
 
-
-    def modrinthToken = System.getenv("MODRINTH_TOKEN")
-
-    if (!modrinthToken) {
-        throw new GradleException("Missing environment variable: MODRINTH_TOKEN")
-    }
-
-    modrinth {
-        token = modrinthToken
-        projectId = modrinth_proj_id
-        uploadFile = tasks.named("jar")
-        gameVersions = sharedGameVersions
-        loaders = sharedLoaders
-        status = status
-        changelog = """
+            p.modrinth {
+                println("versions: $p.ext.sharedGameVersions, loaders: $p.ext.sharedLoaders, status: $p.ext.status")
+                // throw new GradleException("Stopping task because condition was met")
+                token = modrinthToken
+                projectId = modrinth_proj_id
+                uploadFile = tasks.named("jar")
+                gameVersions = p.ext.has('sharedGameVersions') ? p.ext.sharedGameVersions : p.minecraft_version
+                loaders = p.ext.has('supportedLoaders') ? p.ext.supportedLoaders : ["forge"]
+                status = p.ext.has('status') ? p.ext.status : "BETA"
+                changelog = """
 # Version 0.0.5 - AKARI
 - Fixed the capabilities and claimed kits not saving when a player dies, rejoins the world or changes dimensions. This was mainly because the onCLone logic was wrong. It's fixed now tho... (major bug)
 - Added support for 1.20.1 (major addition)
+- Added `autoRollFR` means auto-roll from right-click in config. This makes it so that instead of opening a whole gui to roll it just auto rolls for you and gives you the items. (minor addition)
 """
-        dependencies = [
-                new ModDependency('vvuO3ImH', 'optional'),
-                new ModDependency('Xg35A4rS', 'optional')
-        ]
+                dependencies = [
+                        new ModDependency('vvuO3ImH', 'optional'),
+                        new ModDependency('Xg35A4rS', 'optional')
+                ]
+            }
+        }
     }
 }

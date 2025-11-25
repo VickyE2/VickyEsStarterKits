@@ -51,7 +51,7 @@ public class KitDataManager extends SimpleJsonResourceReloadListener {
         Kit kit = kits.get(kitName);
         if (kit != null) {
             for (Kit.KitItem item : kit.items) {
-                ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(item.item)), item.count);
+                ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(item.item)), item.count);
                 if (item.nbt != null && !item.nbt.isEmpty()) {
                     try {
                         stack.setTag(net.minecraft.nbt.TagParser.parseTag(item.nbt));

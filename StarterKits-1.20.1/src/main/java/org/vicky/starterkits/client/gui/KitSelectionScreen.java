@@ -18,7 +18,7 @@ public class KitSelectionScreen extends Screen {
     private KitList kitList;
 
     public KitSelectionScreen() {
-        super(ComponentUtil.createTranslated("Select Your Starter Kit"));
+        super(ComponentUtil.createStr("Select Your Starter Kit"));
     }
 
     @Override
