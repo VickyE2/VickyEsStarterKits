@@ -8,4 +8,5 @@ public class ClientConfigHolder {
     public static int kitMaxUsages;
     public static boolean kitIsSelectable;
     public static boolean allowRollableKits;
+    public static boolean autoRollOnRightClick;
 }

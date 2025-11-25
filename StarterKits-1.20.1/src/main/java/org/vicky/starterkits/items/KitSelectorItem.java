@@ -14,9 +14,12 @@ import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.vicky.starterkits.client.ComponentUtil;
 import org.vicky.starterkits.network.PacketHandler;
+import org.vicky.starterkits.network.packets.AutoRollForUser;
 import org.vicky.starterkits.network.packets.OpenKitSelectorScreenPacket;
 
 import java.util.UUID;
+
+import static org.vicky.starterkits.client.ClientConfigHolder.autoRollOnRightClick;
 
 public class KitSelectorItem extends Item {
     private static final String TAG_MAX = "MaxUses";
@@ -33,8 +36,14 @@ public class KitSelectorItem extends Item {
             int left = tag.getInt(TAG_LEFT);
 
             if (left > 0) {
-                PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
-                        new OpenKitSelectorScreenPacket());
+                if (autoRollOnRightClick) {
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                            new AutoRollForUser());
+                }
+                else {
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                            new OpenKitSelectorScreenPacket());
+                }
             } else {
                 player.sendSystemMessage(ComponentUtil.createTranslated("§cNo usages left!"));
             }

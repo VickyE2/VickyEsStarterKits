@@ -29,6 +29,7 @@ public class StarterKitsConfig {
         public ForgeConfigSpec.ConfigValue<Boolean> breakKitSelector;
         public ForgeConfigSpec.ConfigValue<Boolean> breakSelectorOnRandomConfirm;
         public ForgeConfigSpec.ConfigValue<Boolean> allowInfiniteKits;
+        public ForgeConfigSpec.ConfigValue<Boolean> autoRollOnRightClick;
 
         public CommonConfig(ForgeConfigSpec.Builder builder) {
             builder.push("General");
@@ -53,6 +54,9 @@ public class StarterKitsConfig {
             allowInfiniteKits = builder
                     .comment("Removes the capability of players claiming a kit once.")
                     .define("allowInfiniteKits", false);
+            autoRollOnRightClick = builder
+                    .comment("This sets weather or not the user upon right click should be automatically equipped with a random kit.")
+                    .define("autoRollOnRightClick", false);
             builder.pop();
             builder.push("SelectorItem");
             kitSelectorItemName = builder

@@ -131,7 +131,8 @@ public class ServerEvents {
                             StarterKitsConfig.COMMON.kitSelectorItemLore.get(),
                             StarterKitsConfig.COMMON.kitMaxUsages.get(),
                             StarterKitsConfig.COMMON.kitIsSelectable.get(),
-                            StarterKitsConfig.COMMON.allowRollableKits.get()
+                            StarterKitsConfig.COMMON.allowRollableKits.get(),
+                            StarterKitsConfig.COMMON.autoRollOnRightClick.get()
                     )
             );
 

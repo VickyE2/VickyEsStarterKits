@@ -15,13 +15,15 @@ public class SyncConfigPacket {
     private final int kitMaxUsages;
     private final boolean kitIsSelectable;
     private final boolean allowRollableKits;
+    private final boolean autoRollOnRightClick;
 
-    public SyncConfigPacket(String itemName, List<String> itemLore, int kitMaxUsages, boolean kitIsSelectable, boolean allowRollableKits) {
+    public SyncConfigPacket(String itemName, List<String> itemLore, int kitMaxUsages, boolean kitIsSelectable, boolean allowRollableKits, boolean autoRollOnRightClick) {
         this.itemName = itemName;
         this.itemLore = itemLore;
         this.kitMaxUsages = kitMaxUsages;
         this.kitIsSelectable = kitIsSelectable;
         this.allowRollableKits = allowRollableKits;
+        this.autoRollOnRightClick = autoRollOnRightClick;
     }
 
     public static void encode(SyncConfigPacket pkt, FriendlyByteBuf buf) {
@@ -31,6 +33,7 @@ public class SyncConfigPacket {
         buf.writeInt(pkt.kitMaxUsages);
         buf.writeBoolean(pkt.kitIsSelectable);
         buf.writeBoolean(pkt.allowRollableKits);
+        buf.writeBoolean(pkt.autoRollOnRightClick);
     }
 
     public static SyncConfigPacket decode(FriendlyByteBuf buf) {
@@ -43,7 +46,8 @@ public class SyncConfigPacket {
         int maxUsages = buf.readInt();
         boolean isSelectable = buf.readBoolean();
         boolean allowRollableKits = buf.readBoolean();
-        return new SyncConfigPacket(itemName, lore, maxUsages, isSelectable, allowRollableKits);
+        boolean autoRollOnRightClick = buf.readBoolean();
+        return new SyncConfigPacket(itemName, lore, maxUsages, isSelectable, allowRollableKits, autoRollOnRightClick);
     }
 
     public static void handle(SyncConfigPacket pkt, Supplier<NetworkEvent.Context> ctx) {
@@ -54,6 +58,7 @@ public class SyncConfigPacket {
                 ClientConfigHolder.kitMaxUsages = pkt.kitMaxUsages;
                 ClientConfigHolder.kitIsSelectable = pkt.kitIsSelectable;
                 ClientConfigHolder.allowRollableKits = pkt.allowRollableKits;
+                ClientConfigHolder.autoRollOnRightClick = pkt.autoRollOnRightClick;
             });
         });
         ctx.get().setPacketHandled(true);

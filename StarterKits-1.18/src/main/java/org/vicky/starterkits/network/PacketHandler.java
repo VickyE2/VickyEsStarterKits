@@ -10,10 +10,12 @@ import org.vicky.starterkits.network.packets.*;
 
 import java.util.Optional;
 
+import static org.vicky.starterkits.StarterKits.LOGGER;
+
 public class PacketHandler {
     private static final String PROTOCOL_VERSION = "1.3";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(StarterKits.MOD_ID, "main"),
+            ResourceLocation.fromNamespaceAndPath(StarterKits.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
@@ -60,9 +62,15 @@ public class PacketHandler {
                 .decoder(RandomKitSelectionResultPacket::decode)
                 .consumer(RandomKitSelectionResultPacket::handle)
                 .add();
+        log("Registering AutoRollForUser at ID " + packetId);
+        INSTANCE.messageBuilder(AutoRollForUser.class, packetId++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(AutoRollForUser::encode)
+                .decoder(AutoRollForUser::decode)
+                .consumer(AutoRollForUser::handle)
+                .add();
     }
 
     private static void log(String msg) {
-        System.out.println("[StarterKits::PacketHandler] " + msg);
+        LOGGER.debug("[StarterKits::PacketHandler] " + msg);
     }
 }
