@@ -9,10 +9,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -46,8 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.vicky.starterkits.init.DefaultInits.makeKitSelectorItem;
-import static org.vicky.starterkits.init.ModItems.ITEMS;
-import static org.vicky.starterkits.init.ModItems.KIT_SELECTOR;
+import static org.vicky.starterkits.init.ModItems.*;
 
 @Mod(StarterKits.MOD_ID)
 public class StarterKits {
@@ -71,6 +72,14 @@ public class StarterKits {
                 StarterKitsConfig.COMMON_SPEC
         );
 
+        modBus.addListener(this::addCreative);
+    }
+
+    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+            event.accept(KIT_SELECTOR);
+            event.accept(KIT_CREATOR);
+        }
     }
 
     private void registerSetup(IEventBus modBus) {

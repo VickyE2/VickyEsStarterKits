@@ -13,7 +13,7 @@ import java.util.Optional;
 public class PacketHandler {
     private static final String PROTOCOL_VERSION = "1.3";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(StarterKits.MOD_ID, "main"),
+            ResourceLocation.fromNamespaceAndPath(StarterKits.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
@@ -40,26 +40,20 @@ public class PacketHandler {
         INSTANCE.messageBuilder(SyncClaimedKitsPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(SyncClaimedKitsPacket::encode)
                 .decoder(SyncClaimedKitsPacket::decode)
-                .consumer(SyncClaimedKitsPacket::handle)
+                .consumerMainThread(SyncClaimedKitsPacket::handle)
                 .add();
         log("Registering SyncConfigPacket at ID " + packetId);
-        INSTANCE.messageBuilder(SyncConfigPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(SyncConfigPacket::encode)
-                .decoder(SyncConfigPacket::decode)
-                .consumer(SyncConfigPacket::handle)
-                .add();
+        INSTANCE.registerMessage(packetId++, SyncConfigPacket.class,
+                        SyncConfigPacket::encode, SyncConfigPacket::decode, SyncConfigPacket::handle,
+                        Optional.of(NetworkDirection.PLAY_TO_CLIENT));
         log("Registering OpenKitSelectorScreenPacket at ID " + packetId);
-        INSTANCE.messageBuilder(OpenKitSelectorScreenPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(OpenKitSelectorScreenPacket::decode)
-                .encoder(OpenKitSelectorScreenPacket::encode)
-                .consumer(OpenKitSelectorScreenPacket::handle)
-                .add();
+        INSTANCE.registerMessage(packetId++, OpenKitSelectorScreenPacket.class,
+                 OpenKitSelectorScreenPacket::encode, OpenKitSelectorScreenPacket::decode, OpenKitSelectorScreenPacket::handle,
+                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
         log("Registering RandomKitSelectionResultPacket at ID " + packetId);
-        INSTANCE.messageBuilder(RandomKitSelectionResultPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(RandomKitSelectionResultPacket::encode)
-                .decoder(RandomKitSelectionResultPacket::decode)
-                .consumer(RandomKitSelectionResultPacket::handle)
-                .add();
+        INSTANCE.registerMessage(packetId++, RandomKitSelectionResultPacket.class,
+                 RandomKitSelectionResultPacket::encode, RandomKitSelectionResultPacket::decode, RandomKitSelectionResultPacket::handle,
+                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 
     private static void log(String msg) {

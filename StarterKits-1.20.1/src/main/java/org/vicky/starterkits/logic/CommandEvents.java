@@ -1,8 +1,6 @@
 package org.vicky.starterkits.logic;
 
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -28,7 +26,7 @@ public class CommandEvents {
                                 .requires(source -> source.hasPermission(2))
                                 .executes(ctx -> {
                                     StarterKits.KIT_DATA.reloadKitsFromConfigFolder();
-                                    ctx.getSource().sendSuccess(ComponentUtil.colorize("§aReloaded!"), true);
+                                    ctx.getSource().sendSuccess(() -> ComponentUtil.colorize("§aReloaded!"), true);
                                     return 1;
                                 })
                         )
@@ -56,7 +54,7 @@ public class CommandEvents {
                                             builder.append("\n  ").append(perm);
                                         }
                                     }
-                                    ctx.getSource().sendSuccess(ComponentUtil.colorize("§aAvailable kits: " + kits.size() + builder), false);
+                                    ctx.getSource().sendSuccess(() -> ComponentUtil.colorize("§aAvailable kits: " + kits.size() + builder), false);
                                     return 1;
                                 })
                         )
@@ -66,7 +64,7 @@ public class CommandEvents {
                                 )
                                 .executes(ctx -> {
                                     var item = makeKitSelectorItem(
-                                            ForgeRegistries.ITEMS.getValue(new ResourceLocation(MOD_ID, "kit_selector")),
+                                            ForgeRegistries.ITEMS.getValue(ResourceLocation.fromNamespaceAndPath(MOD_ID, "kit_selector")),
                                             StarterKitsConfig.COMMON.kitSelectorItemName.get(),
                                             StarterKitsConfig.COMMON.kitSelectorItemLore.get(),
                                             StarterKitsConfig.COMMON.kitMaxUsages.get()

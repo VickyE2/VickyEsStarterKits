@@ -13,4 +13,4 @@ plugins {
 }
 
 rootProject.name = 'StarterKits'
-include 'StarterKits-1.20.1', 'StarterKits-1.18.2'
+include 'StarterKits-1.20.1', 'StarterKits-1.18'

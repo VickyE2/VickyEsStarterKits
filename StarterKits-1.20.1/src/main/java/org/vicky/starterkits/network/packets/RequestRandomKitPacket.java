@@ -43,10 +43,10 @@ public record RequestRandomKitPacket() {
                                 new RandomKitSelectionResultPacket(kit.name, left)
                         );
                     } else {
-                        player.sendMessage(ComponentUtil.createTranslated("§cNo kits available!"), player.getUUID());
+                        player.sendSystemMessage(ComponentUtil.createTranslated("§cNo kits available!"));
                     }
                 } else {
-                    player.sendMessage(ComponentUtil.createTranslated("§cNo usages left!"), player.getUUID());
+                    player.sendSystemMessage(ComponentUtil.createTranslated("§cNo usages left!"));
                 }
             }
         });

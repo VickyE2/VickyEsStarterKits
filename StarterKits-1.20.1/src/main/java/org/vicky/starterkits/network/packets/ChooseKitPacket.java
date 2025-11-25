@@ -60,7 +60,7 @@ public record ChooseKitPacket(String kitName, boolean shouldDegrade, boolean isR
                             stack.shrink(1);
                         }
                     } else {
-                        player.sendMessage(ComponentUtil.createTranslated("You already claimed this kit!"), player.getUUID());
+                        player.sendSystemMessage(ComponentUtil.createTranslated("You already claimed this kit!"));
                     }
                 });
             }

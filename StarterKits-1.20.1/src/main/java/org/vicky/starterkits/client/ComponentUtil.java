@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 public class ComponentUtil {
     public static List<String> convertToFormatted(List<Component> components) {
@@ -21,7 +19,7 @@ public class ComponentUtil {
     }
 
     public static MutableComponent createStr(String str) {
-        return new TextComponent(str);
+        return Component.literal(str);
     }
     public static Component colorize(String text) {
         // Simple version: replace & or § codes with MC format codes and parse
@@ -43,6 +41,6 @@ public class ComponentUtil {
     }
 
     public static MutableComponent createTranslated(String unlocalized) {
-        return new TranslatableComponent(unlocalized);
+        return Component.translatable(unlocalized);
     }
 }

@@ -1,7 +1,7 @@
 apply plugin: 'net.minecraftforge.gradle'
 
 sharedGameVersions.clear()
-sharedGameVersions.addAll(['1.20.1', '1.20.1-pre'])
+sharedGameVersions.addAll(['1.20.1'])
 
 minecraft {
     // The mappings can be changed at any time and must be in the following format.
@@ -129,7 +129,6 @@ dependencies {
     compileOnly fg.deobf("com.blamejared.crafttweaker:CraftTweaker-forge-1.20.1:14.0.56")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.12.0+1.20.1:api")
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.12.0+1.20.1")
-
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -149,7 +148,8 @@ tasks.named('processResources', ProcessResources).configure {
 
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
-    }}
+    }
+}
 
 // Example for how to get properties into the manifest for reading at runtime.
 tasks.named('jar', Jar).configure {
@@ -171,11 +171,4 @@ tasks.named('jar', Jar).configure {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-}
-
-
-def modrinthToken = System.getenv("MODRINTH_TOKEN")
-
-if (!modrinthToken) {
-    throw new GradleException("Missing environment variable: MODRINTH_TOKEN")
 }

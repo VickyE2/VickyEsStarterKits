@@ -46,7 +46,7 @@ public class SlotHelper {
                 player.getInventory().setItem(player.getInventory().selected, stack);
             }
             default -> {
-                player.sendMessage(ComponentUtil.createTranslated("§cUnknown vanilla slot '" + slot + "'"), player.getUUID());
+                player.sendSystemMessage(ComponentUtil.createTranslated("§cUnknown vanilla slot '" + slot + "'"));
                 StarterKits.LOGGER.warn("Unknown vanilla slot '{}'", slot);
                 player.addItem(stack);
             }

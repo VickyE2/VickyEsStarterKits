@@ -2,7 +2,7 @@ package org.vicky.starterkits.client.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -55,12 +55,12 @@ public class KitCreationScreen extends Screen {
 
         permissionField = new EditBox(this.font, 10, y, 130, 20, ComponentUtil.createTranslated("Permission Name"));
         this.addRenderableWidget(permissionField);
-        this.addRenderableWidget(new Button(permissionField.x + permissionField.getWidth() + 10, permissionField.y, 20, 20, ComponentUtil.createTranslated("+"), btn -> {
+        this.addRenderableWidget(Button.builder(ComponentUtil.createTranslated("+"), btn -> {
             if (!permissionField.getValue().isEmpty()) {
                 perms.add(permissionField.getValue());
                 permissionField.setValue("");
             }
-        }));
+        }).bounds(permissionField.getX() + permissionField.getWidth() + 10, permissionField.getY(), 20, 20).build());
 
         y += 20 + spacing;
 
@@ -79,7 +79,7 @@ public class KitCreationScreen extends Screen {
         slotNameField.setTextColor(0xFF888888);
         this.addRenderableWidget(slotNameField);
 
-        this.addRenderableWidget(new Button(width - 30, 4*18 + 30, 20, 20, ComponentUtil.createTranslated("+"), btn -> {
+        this.addRenderableWidget(Button.builder(ComponentUtil.createTranslated("+"), btn -> {
             if (!inputStack.isEmpty()) {
                 if (!slotNameField.getValue().isEmpty()) {
                     slotables.put(inputStack.copy(), slotNameField.getValue());
@@ -88,7 +88,9 @@ public class KitCreationScreen extends Screen {
                 }
                 inputStack = ItemStack.EMPTY;
             }
-        }));
+        })
+      .bounds(width - 30, 4*18 + 30, 20, 20)
+      .build());
 
         // Confirm button
         weight = new EditBox(this.font, width - 9*18, height - 60, 9*18 - 10, 20, ComponentUtil.createTranslated("Weight"));
@@ -99,9 +101,11 @@ public class KitCreationScreen extends Screen {
             }
         });
         this.addRenderableWidget(weight);
-        this.addRenderableWidget(new Button(width - 9*18, height - 30, 9*18 - 10, 20, ComponentUtil.createTranslated("Confirm"), btn -> {
+        this.addRenderableWidget(Button.builder(ComponentUtil.createTranslated("Confirm"), btn -> {
             confirmKit();
-        }));
+        })
+      .bounds(width - 9*18, height - 30, 9*18 - 10, 20)
+      .build());
     }
 
     private void confirmKit() {
@@ -123,22 +127,22 @@ public class KitCreationScreen extends Screen {
     }
 
     @Override
-    public void render(@NotNull PoseStack stack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@NotNull GuiGraphics stack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(stack);
         assert mc.screen != null;
 
-        drawCenteredString(stack, this.font, this.title, this.width / 2, this.height - 10, 0xFFFFFF);
-        drawString(stack, this.font, "Kit Name:", nameField.x, nameField.y - 15, 0xFFFFFF);
-        drawString(stack, this.font, "Kit Description:", descField.x, descField.y - 15, 0xFFFFFF);
-        drawString(stack, this.font, "Optional Permission Name:", permissionField.x, permissionField.y - 15, 0xFFFFFF);
-        drawString(stack, this.font, "Kit Random Pull Weight:", weight.x, weight.y - 15, 0xFFFFFF);
+        stack.drawCenteredString(this.font, this.title, this.width / 2, this.height - 10, 0xFFFFFF);
+        stack.drawString(this.font, "Kit Name:", nameField.getX(), nameField.getY() - 15, 0xFFFFFF);
+        stack.drawString(this.font, "Kit Description:", descField.getX(), descField.getY() - 15, 0xFFFFFF);
+        stack.drawString(this.font, "Optional Permission Name:", permissionField.getX(), permissionField.getY() - 15, 0xFFFFFF);
+        stack.drawString(this.font, "Kit Random Pull Weight:", weight.getX(), weight.getY() - 15, 0xFFFFFF);
         super.render(stack, mouseX, mouseY, partialTicks);
         int slotX = width - 57;
-        fill(stack, slotX, 4*18 + 30, slotX + 20, 4*18 + 30 + 20, 0x44447777); // slot border
+        stack.fill(slotX, 4*18 + 30, slotX + 20, 4*18 + 30 + 20, 0x44447777); // slot border
         if (!inputStack.isEmpty()) {
-            this.itemRenderer.renderAndDecorateItem(inputStack, slotX, slotY);
+            stack.renderItem(inputStack, slotX, slotY);
             if (mouseX >= slotX && mouseX <= slotX + 16 && mouseY >= slotY && mouseY <= slotY + 16) {
-                renderTooltip(stack, mc.screen.getTooltipFromItem(inputStack), Optional.empty(), mouseX, mouseY);
+                stack.renderTooltip(this.font, inputStack, mouseX, mouseY);
             }
         }
 
@@ -151,7 +155,7 @@ public class KitCreationScreen extends Screen {
         rows = Math.max(rows, 1);
         int bgWidth = itemsPerRow * slotSize + padding * 2;
         int bgHeight = rows * slotSize + padding * 2;
-        fill(stack, startX - padding, startY - padding, startX - padding + bgWidth, startY - padding + bgHeight, 0x44447777); // semi-transparent black
+        stack.fill(startX - padding, startY - padding, startX - padding + bgWidth, startY - padding + bgHeight, 0x44447777); // semi-transparent black
         for (int i = 0; i < kitItems.size(); i++) {
             int row = i / itemsPerRow;
             int col = i % itemsPerRow;
@@ -159,11 +163,11 @@ public class KitCreationScreen extends Screen {
             int y = startY + row * slotSize;
 
             ItemStack s = kitItems.get(i);
-            this.itemRenderer.renderAndDecorateItem(s, x, y);
+            stack.renderItem(s, x, y);
 
             // Fix your tooltip check Y to be y
             if (mouseX >= x && mouseX <= x + 16 && mouseY >= y && mouseY <= y + 16) {
-                renderTooltip(stack, mc.screen.getTooltipFromItem(s), Optional.empty(), mouseX, mouseY);
+                stack.renderTooltip(this.font, s, mouseX, mouseY);
             }
         }
 
@@ -173,7 +177,7 @@ public class KitCreationScreen extends Screen {
         rows = Math.max(rows, 1);
         bgWidth = itemsPerRow * slotSize + padding * 2;
         bgHeight = rows * slotSize + padding * 2;
-        fill(stack, startX - padding, startY - padding, startX - padding + bgWidth, startY - padding + bgHeight, 0x44447777); // semi-transparent black
+        stack.fill(startX - padding, startY - padding, startX - padding + bgWidth, startY - padding + bgHeight, 0x44447777); // semi-transparent black
         for (int i = 0; i < slotables.size(); i++) {
             int row = i / itemsPerRow;
             int col = i % itemsPerRow;
@@ -181,11 +185,11 @@ public class KitCreationScreen extends Screen {
             int y = startY + row * slotSize;
 
             ItemStack s = slotables.keySet().stream().toList().get(i);
-            this.itemRenderer.renderAndDecorateItem(s, x, y);
-            var tooltip = mc.screen.getTooltipFromItem(s);
+            stack.renderItem(s, x, y);
+            var tooltip = getTooltipFromItem(mc, s);
             tooltip.add(ComponentUtil.createTranslated("This will be placed in the " + slotables.get(s) + " slot..."));
             if (mouseX >= x && mouseX <= x + 16 && mouseY >= y && mouseY <= y + 16) {
-                renderTooltip(stack, tooltip, Optional.empty(), mouseX, mouseY);
+                stack.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
             }
         }
 
@@ -196,13 +200,13 @@ public class KitCreationScreen extends Screen {
         rows = Math.max(rows, 1);
         bgWidth = itemsPerRow * slotSize + padding * 2;
         bgHeight = rows * 15 + padding * 2;
-        startY = permissionField.y + 30;
-        startX = permissionField.x;
-        fill(stack, startX - padding, startY - padding, startX - padding + bgWidth, startY - padding + bgHeight, 0x44447777); // semi-transparent black
+        startY = permissionField.getY() + 30;
+        startX = permissionField.getX();
+        stack.fill(startX - padding, startY - padding, startX - padding + bgWidth, startY - padding + bgHeight, 0x44447777); // semi-transparent black
         for (int i = 0; i < perms.size(); i++) {
             int row = i / itemsPerRow;
             int y = startY + row * slotSize;
-            drawString(stack, this.font, perms.get(i),  slotX, y, 0xFFFFFFFF);
+            stack.drawString(this.font, perms.get(i),  slotX, y, 0xFFFFFFFF);
         }
 
     }

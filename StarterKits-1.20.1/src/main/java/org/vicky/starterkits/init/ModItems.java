@@ -12,10 +12,10 @@ public class ModItems {
 
     public static final RegistryObject<Item> KIT_SELECTOR = ITEMS.register("kit_selector",
             () -> new org.vicky.starterkits.items.KitSelectorItem(
-                    new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_MISC)
+                    new Item.Properties().stacksTo(1)
             ));
-    public static final RegistryObject<Item> KIT_CREATOR= ITEMS.register("kit_creator",
+    public static final RegistryObject<Item> KIT_CREATOR = ITEMS.register("kit_creator",
             () -> new org.vicky.starterkits.items.KitCreatorItem(
-                    new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_MISC)
+                    new Item.Properties().stacksTo(1)
             ));
 }

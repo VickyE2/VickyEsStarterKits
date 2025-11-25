@@ -16,7 +16,7 @@ public class ClientPacketHandlers {
             if (kit != null)
                 Minecraft.getInstance().setScreen(new RandomKitConfirmationScreen(kit, rollsLeft));
             else
-                Minecraft.getInstance().player.sendMessage(ComponentUtil.createTranslated("A sever desync error has occurred. please retry"), Minecraft.getInstance().player.getUUID());
+                Minecraft.getInstance().player.sendSystemMessage(ComponentUtil.createTranslated("A sever desync error has occurred. please retry"));
         }
     }
 }

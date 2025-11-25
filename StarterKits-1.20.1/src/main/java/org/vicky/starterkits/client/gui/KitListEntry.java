@@ -2,13 +2,12 @@ package org.vicky.starterkits.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +21,8 @@ import org.vicky.starterkits.data.Kit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static net.minecraft.client.gui.screens.Screen.getTooltipFromItem;
 
 public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntry> {
     public final Kit kit;
@@ -37,26 +38,26 @@ public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntr
     }
 
     @Override
-    public void render(PoseStack poseStack, int index, int y, int x, int width, int height,
+    public void render(GuiGraphics poseStack, int index, int y, int x, int width, int height,
                        int mouseX, int mouseY, boolean hovered, float partialTicks) {
         Minecraft mc = Minecraft.getInstance();
         int iconX = x + 30;
         int iconY = y + 30;
         if (blinkTicksRemaining > 0 && blinkOn) {
-            Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_BASS, 1.0F, 0.5F);
-            GuiComponent.fill(poseStack, x - 30, y + 4, x + width + 34, y + 50, 0x88FF0000);
+            Minecraft.getInstance().player.playSound(SoundEvents.NOTE_BLOCK_BASS.value(), 1.0F, 0.5F);
+            poseStack.fill(x - 30, y + 4, x + width + 34, y + 50, 0x88FF0000);
         } else if (list.getSelected() == this) {
-            GuiComponent.fill(poseStack, x, y + (height / 2) - 10,  x + 20, y + (height / 2) + 10, 0xFF00AA00);
+            poseStack.fill(x, y + (height / 2) - 10,  x + 20, y + (height / 2) + 10, 0xFF00AA00);
         }
 
         if (!kit.canClaimKit(mc.player)) {
             if (hovered) {
-                mc.screen.renderTooltip(poseStack, List.of(ComponentUtil.colorize("§6You don't have sufficient permissions for this kit.")), java.util.Optional.empty(), mouseX, mouseY);
+                poseStack.renderTooltip(mc.font, List.of(ComponentUtil.colorize("§6You don't have sufficient permissions for this kit.")), java.util.Optional.empty(), mouseX, mouseY);
             }
         }
         if (ClientClaimedKitsManager.INSTANCE.isClaimed(kit.name)) {
             if (hovered) {
-                mc.screen.renderTooltip(poseStack, List.of(ComponentUtil.colorize("§cYou have already claimed this kit.")), java.util.Optional.empty(), mouseX, mouseY);
+                poseStack.renderTooltip(mc.font, List.of(ComponentUtil.colorize("§cYou have already claimed this kit.")), java.util.Optional.empty(), mouseX, mouseY);
             }
         }
 
@@ -67,17 +68,17 @@ public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntr
                     previewStack.setTag(net.minecraft.nbt.TagParser.parseTag(kitItem.nbt));
                 } catch (Exception ignored) {}
             }
-            itemRenderer.renderAndDecorateItem(previewStack, iconX, iconY);
-            itemRenderer.renderGuiItemDecorations(mc.font, previewStack, iconX, iconY);
+            poseStack.renderItem(previewStack, iconX, iconY);
+            poseStack.renderItemDecorations(mc.font, previewStack, iconX, iconY);
             if (mouseX >= iconX && mouseX <= iconX + 16 && mouseY >= iconY && mouseY <= iconY + 16) {
-                mc.screen.renderTooltip(poseStack, mc.screen.getTooltipFromItem(previewStack), java.util.Optional.empty(), mouseX, mouseY);
+                poseStack.renderTooltip(mc.font, previewStack, mouseX, mouseY);
             }
             iconX += 18;
         }
 
         for (Kit.KitSlotable slotItem : kit.slotables) {
             String[] parts = slotItem.item.split(":");
-            ResourceLocation itemId = new ResourceLocation(parts[0], parts[1]);
+            ResourceLocation itemId = ResourceLocation.fromNamespaceAndPath(parts[0], parts[1]);
             int count = parts.length >= 3 ? Integer.parseInt(parts[2]) : 1;
             ItemStack previewStack = new ItemStack(ForgeRegistries.ITEMS.getValue(itemId), count);
             if (slotItem.nbt != null && !slotItem.nbt.isEmpty()) {
@@ -85,9 +86,9 @@ public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntr
                     previewStack.setTag(net.minecraft.nbt.TagParser.parseTag(slotItem.nbt));
                 } catch (Exception ignored) {}
             }
-            itemRenderer.renderAndDecorateItem(previewStack, iconX, iconY);
-            itemRenderer.renderGuiItemDecorations(mc.font, previewStack, iconX, iconY);
-            var kitTooltip = mc.screen.getTooltipFromItem(previewStack);
+            poseStack.renderItem(previewStack, iconX, iconY);
+            poseStack.renderItemDecorations(mc.font, previewStack, iconX, iconY);
+            var kitTooltip = getTooltipFromItem(mc, previewStack);
             kitTooltip.add(ComponentUtil.createTranslated(""));
             kitTooltip.add(ComponentUtil.createTranslated("§o§bThis is equipped in the " + slotItem.slot + " slot"));
             if (mouseX >= iconX && mouseX <= iconX + 16 && mouseY >= iconY && mouseY <= iconY + 16) {
@@ -110,14 +111,14 @@ public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntr
                     tooltipY = screenHeight - tooltipHeight;
                 }
                 // Finally render
-                mc.screen.renderTooltip(poseStack, kitTooltip, Optional.empty(), tooltipX, tooltipY);
+                poseStack.renderTooltip(mc.font, kitTooltip, Optional.empty(), tooltipX, tooltipY);
             }
             iconX += 18;
         }
 
         // Draw kit name & description
-        mc.font.draw(poseStack, kit.name, x + 30, y + 10, (kit.textColor | 0xFF000000));
-        mc.font.draw(poseStack, kit.description, x + 30, y + 20, (kit.descriptionColor | 0xFF000000));
+        poseStack.drawString(mc.font, kit.name, x + 30, y + 10, (kit.textColor | 0xFF000000));
+        poseStack.drawString(mc.font, kit.description, x + 30, y + 20, (kit.descriptionColor | 0xFF000000));
         // new DividerEntry().render(poseStack, index, y, x, width, height, mouseX, mouseY, hovered, partialTicks);
     }
 
@@ -160,35 +161,5 @@ public class KitListEntry extends ContainerObjectSelectionList.Entry<KitListEntr
 
     private void select() {
         list.setSelected(this);
-    }
-
-    private void drawX(PoseStack poseStack, int r, int g, int b, int x, int y, int height) {
-        // draw an X in the middle
-        int centerY = y + (height/2);
-        int centerX = x + 10;
-        int size = 6;
-
-        poseStack.pushPose();
-        poseStack.translate(0, 0, 200); // bring above background
-        RenderSystem.disableTexture();
-        RenderSystem.lineWidth(2.0F);
-
-        Tesselator tess = Tesselator.getInstance();
-        BufferBuilder buffer = tess.getBuilder();
-
-        // first diagonal
-        buffer.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(centerX - size, centerY - size, 0).color(r, g, b, 255).endVertex();
-        buffer.vertex(centerX + size, centerY + size, 0).color(r, g, b, 255).endVertex();
-        tess.end();
-
-        // second diagonal
-        buffer.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(centerX - size, centerY + size, 0).color(r, g, b, 255).endVertex();
-        buffer.vertex(centerX + size, centerY - size, 0).color(r, g, b, 255).endVertex();
-        tess.end();
-
-        RenderSystem.enableTexture();
-        poseStack.popPose();
     }
 }

@@ -61,7 +61,7 @@ public class KitDataManager extends SimpleJsonResourceReloadListener {
             }
             for (Kit.KitSlotable slotable : kit.slotables) {
                 String[] parts = slotable.item.split(":");
-                ResourceLocation itemId = new ResourceLocation(parts[0], parts[1]);
+                ResourceLocation itemId = ResourceLocation.fromNamespaceAndPath(parts[0], parts[1]);
                 int count = parts.length >= 3 ? Integer.parseInt(parts[2]) : 1;
                 ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(itemId), count);
                 if (slotable.nbt != null && !slotable.nbt.isEmpty()) {
@@ -73,7 +73,7 @@ public class KitDataManager extends SimpleJsonResourceReloadListener {
                     if (CommonsVariables.curiosLoaded)
                         CuriosHelper.giveToSlot(player, slotable.slot, stack);
                     else {
-                        player.sendMessage(ComponentUtil.createTranslated("§cCurios mod not installed: cannot equip to slot '" + slotable.slot + "'"), player.getUUID());
+                        player.sendSystemMessage(ComponentUtil.createTranslated("§cCurios mod not installed: cannot equip to slot '" + slotable.slot + "'"));
                         StarterKits.LOGGER.warn("Curios mod not installed: cannot equip to slot '{}'", slotable.slot);
                         player.addItem(stack);
                     }

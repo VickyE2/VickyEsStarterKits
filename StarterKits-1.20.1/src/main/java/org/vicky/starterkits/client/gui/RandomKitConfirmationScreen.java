@@ -2,10 +2,10 @@ package org.vicky.starterkits.client.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import org.vicky.starterkits.client.ClientKitManager;
 import org.vicky.starterkits.client.ComponentUtil;
-import org.vicky.starterkits.config.StarterKitsConfig;
 import org.vicky.starterkits.data.Kit;
 import org.vicky.starterkits.network.packets.ChooseKitPacket;
 import org.vicky.starterkits.network.packets.RequestRandomKitPacket;
@@ -33,29 +33,25 @@ public class RandomKitConfirmationScreen extends Screen {
         this.addRenderableWidget(kitList);
 
         // Retry button
-        var retryButton = new net.minecraft.client.gui.components.Button(
-                this.width / 2 - 50, this.height - 60, 100, 20,
-                ComponentUtil.createTranslated("Retries left: " + rollsLeft),
-                btn -> {
+        var retryButton = Button.builder(ComponentUtil.createTranslated("Retries left: " + rollsLeft), btn -> {
                     onClose();
                     org.vicky.starterkits.network.PacketHandler.INSTANCE.sendToServer(
                             new RequestRandomKitPacket()
                     );
-                }
-        );
+                })
+                .bounds(this.width / 2 - 50, this.height - 60, 100, 20)
+                .build();
         retryButton.active = rollsLeft > 0;
         this.addRenderableWidget(retryButton);
         // Confirm button
-        this.addRenderableWidget(new net.minecraft.client.gui.components.Button(
-                this.width / 2 - 50, this.height - 30, 100, 20,
-                ComponentUtil.createTranslated("Confirm"),
-                btn -> confirmSelection()
-        ));
+        this.addRenderableWidget(Button.builder(ComponentUtil.createTranslated("Confirm"), btn -> confirmSelection())
+                .bounds(this.width / 2 - 50, this.height - 30, 100, 20)
+                .build());
     }
 
     @Override
-    public void renderBackground(PoseStack poseStack) {
-        fill(poseStack, 0, 0, this.width, this.height, 0x88000000); // ARGB with alpha=0x88
+    public void renderBackground(GuiGraphics poseStack) {
+        poseStack.fill(0, 0, this.width, this.height, 0x88000000); // ARGB with alpha=0x88
     }
 
     private void confirmSelection() {
@@ -77,10 +73,10 @@ public class RandomKitConfirmationScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics poseStack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(poseStack);
         kitList.tick();
-        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 15, 0xFFFFFF);
+        poseStack.drawCenteredString(this.font, this.title, this.width / 2, 15, 0xFFFFFF);
         super.render(poseStack, mouseX, mouseY, partialTicks);
     }
 }

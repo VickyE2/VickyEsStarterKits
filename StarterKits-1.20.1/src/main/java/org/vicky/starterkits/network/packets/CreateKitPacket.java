@@ -147,10 +147,10 @@ public record CreateKitPacket(String kitName, @Nullable String description, List
             }
             try (FileWriter writer = new FileWriter(jsonKitFile)) {
                 writer.write(jsonKit);
-                ctx.get().getSender().sendMessage(ComponentUtil.createTranslated("§aKit Created Successfully"), UUID.randomUUID());
+                ctx.get().getSender().sendSystemMessage(ComponentUtil.createTranslated("§aKit Created Successfully"));
             } catch (IOException e) {
                 StarterKits.LOGGER.error("Could not write kit JSON!", e);
-                ctx.get().getSender().sendMessage(ComponentUtil.createTranslated("§sCould not write kit JSON! " + e.getMessage()), UUID.randomUUID());
+                ctx.get().getSender().sendSystemMessage(ComponentUtil.createTranslated("§sCould not write kit JSON! " + e.getMessage()));
                 e.printStackTrace();
             }
         });

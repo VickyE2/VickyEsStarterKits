@@ -1,16 +1,14 @@
 package org.vicky.starterkits.client.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.material.Material;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -27,7 +25,6 @@ import java.util.function.Consumer;
 public class PlayerInventoryWidget extends AbstractWidget {
 
     private final Minecraft mc = Minecraft.getInstance();
-    private final ItemRenderer itemRenderer = mc.getItemRenderer();
     private final Consumer<ItemStack> onItemClicked;
 
     private final int cols = 9;
@@ -35,12 +32,12 @@ public class PlayerInventoryWidget extends AbstractWidget {
     private final int slotSize = 18;
 
     public PlayerInventoryWidget(int x, int y, Consumer<ItemStack> onItemClicked) {
-        super(x, y, 9 * 18, 4 * 18, net.minecraft.network.chat.TextComponent.EMPTY);
+        super(x, y, 9 * 18, 4 * 18, Component.empty());
         this.onItemClicked = onItemClicked;
     }
 
     @Override
-    public void render(@NotNull PoseStack stack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@NotNull GuiGraphics stack, int mouseX, int mouseY, float partialTicks) {
         assert mc.player != null;
         assert mc.screen != null;
 
@@ -52,14 +49,14 @@ public class PlayerInventoryWidget extends AbstractWidget {
                 int index = (row == 3) ? col : 9 + row * 9 + col;
                 ItemStack slotStack = inventory.getItem(index);
 
-                int slotX = this.x + col * slotSize;
-                int slotY = this.y + row * slotSize;
+                int slotX = getX() + col * slotSize;
+                int slotY = getY() + row * slotSize;
 
-                fill(stack, slotX - 1, slotY - 1, slotX + 17, slotY + 17, 0xFF444444);
+                stack.fill(slotX - 1, slotY - 1, slotX + 17, slotY + 17, 0xFF444444);
 
                 if (!slotStack.is(Items.AIR)) {
-                    itemRenderer.renderAndDecorateItem(slotStack, slotX, slotY);
-                    itemRenderer.renderGuiItemDecorations(mc.font, slotStack, slotX, slotY);
+                    stack.renderItem(slotStack, slotX, slotY);
+                    stack.renderItemDecorations(mc.font, slotStack, slotX, slotY);
                     if (mouseX >= slotX && mouseX <= slotX + 16 && mouseY >= slotY && mouseY <= slotY + 16) {
                         hoveredStack = slotStack;
                     }
@@ -68,8 +65,13 @@ public class PlayerInventoryWidget extends AbstractWidget {
         }
 
         if (!hoveredStack.isEmpty()) {
-            mc.screen.renderTooltip(stack, mc.screen.getTooltipFromItem(hoveredStack), Optional.empty(), mouseX, mouseY);
+            stack.renderTooltip(mc.font, hoveredStack, mouseX, mouseY);
         }
+
+    }
+
+    @Override
+    protected void renderWidget(GuiGraphics p_282139_, int p_268034_, int p_268009_, float p_268085_) {
 
     }
 
@@ -82,8 +84,8 @@ public class PlayerInventoryWidget extends AbstractWidget {
             for (int col = 0; col < cols; col++) {
                 int index = (row == 3) ? col : 9 + row * 9 + col;
 
-                int slotX = this.x + col * slotSize;
-                int slotY = this.y + row * slotSize;
+                int slotX = getX() + col * slotSize;
+                int slotY = getY() + row * slotSize;
 
                 if (mouseX >= slotX && mouseX <= slotX + 16 && mouseY >= slotY && mouseY <= slotY + 16) {
                     ItemStack clicked = inventory.getItem(index);
@@ -98,7 +100,7 @@ public class PlayerInventoryWidget extends AbstractWidget {
     }
 
     @Override
-    public void updateNarration(@NotNull NarrationElementOutput p_169152_) {
+    protected void updateWidgetNarration(NarrationElementOutput p_259858_) {
 
     }
 }

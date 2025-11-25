@@ -2,12 +2,10 @@ package org.vicky.starterkits.client.gui.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.SliderButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.network.chat.TextComponent;
-import org.apache.commons.lang3.function.TriFunction;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -20,7 +18,7 @@ public class ColorPickerWidget extends AbstractWidget {
     private int red = 255, green = 255, blue = 255;
 
     public ColorPickerWidget(int x, int y, Function<Integer, Void> onChange) {
-        super(x, y, 0, 0, new TextComponent("Color Picker"));
+        super(x, y, 0, 0, Component.literal("Color Picker"));
 
         int sliderWidth = 120;
         int sliderHeight = 20;
@@ -41,22 +39,27 @@ public class ColorPickerWidget extends AbstractWidget {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@NotNull GuiGraphics poseStack, int mouseX, int mouseY, float partialTicks) {
         redSlider.render(poseStack, mouseX, mouseY, partialTicks);
         greenSlider.render(poseStack, mouseX, mouseY, partialTicks);
         blueSlider.render(poseStack, mouseX, mouseY, partialTicks);
 
         // Draw preview box under sliders
-        int previewX = x + 130;
-        int previewY = y;
+        int previewX = getX() + 130;
+        int previewY = getY();
         int previewW = 20;
         int previewH = 70;
 
-        fill(poseStack, previewX, previewY, previewX + previewW, previewY + previewH, getColorInt());
+        poseStack.fill(previewX, previewY, previewX + previewW, previewY + previewH, getColorInt());
 
         // Draw hex text
         String hex = getHex();
-        mc.font.draw(poseStack, "Hex: " + hex, x + 5, previewY + 80, 0xFFFFFF);
+        poseStack.drawString(mc.font, "Hex: " + hex, getX() + 5, previewY + 80, 0xFFFFFF);
+    }
+
+    @Override
+    protected void renderWidget(GuiGraphics p_282139_, int p_268034_, int p_268009_, float p_268085_) {
+
     }
 
     private int getColorInt() {
@@ -93,6 +96,11 @@ public class ColorPickerWidget extends AbstractWidget {
     }
 
     @Override
+    protected void updateWidgetNarration(NarrationElementOutput p_259858_) {
+
+    }
+
+    @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (activeSlider != null) {
             boolean handled = activeSlider.mouseReleased(mouseX, mouseY, button);
@@ -100,10 +108,5 @@ public class ColorPickerWidget extends AbstractWidget {
             return handled;
         }
         return false;
-    }
-
-    @Override
-    public void updateNarration(@NotNull NarrationElementOutput p_169152_) {
-
     }
 }

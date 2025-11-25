@@ -55,7 +55,7 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
         if (!(event.getObject() instanceof Player player)) return;
-        if (player.getLevel().isClientSide()) return;
+        if (player.level().isClientSide()) return;
 
         event.addCapability(ID, new ClaimedKitsProvider());
     }

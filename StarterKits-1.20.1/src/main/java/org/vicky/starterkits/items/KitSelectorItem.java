@@ -36,7 +36,7 @@ public class KitSelectorItem extends Item {
                 PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
                         new OpenKitSelectorScreenPacket());
             } else {
-                player.sendMessage(ComponentUtil.createTranslated("§cNo usages left!"), UUID.randomUUID());
+                player.sendSystemMessage(ComponentUtil.createTranslated("§cNo usages left!"));
             }
         }
 
